@@ -1,0 +1,35 @@
+.admin-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.admin-login form {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.admin-login h2 {
+  margin-bottom: 1rem;
+}
+
+.admin-login input {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.admin-login button {
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.admin-login .error {
+  color: red;
+  margin-bottom: 1rem;
+}

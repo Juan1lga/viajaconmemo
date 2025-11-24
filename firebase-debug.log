@@ -1,0 +1,142 @@
+[debug] [2025-11-14T23:02:51.519Z] ----------------------------------------------------------------------
+[debug] [2025-11-14T23:02:51.528Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\JUAN ARIEL\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2025-11-14T23:02:51.529Z] CLI Version:   14.25.0
+[debug] [2025-11-14T23:02:51.530Z] Platform:      win32
+[debug] [2025-11-14T23:02:51.530Z] Node Version:  v20.19.5
+[debug] [2025-11-14T23:02:51.531Z] Time:          Fri Nov 14 2025 18:02:51 GMT-0500 (hora estándar de Cuba)
+[debug] [2025-11-14T23:02:51.531Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-14T23:02:51.538Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\JUAN ARIEL\Desktop\VIAJA CON MEMO
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[debug] [2025-11-14T23:02:53.528Z] *** [apiv2] error from fetch(https://firebase-public.firebaseio.com/cli.json, {"headers":{},"method":"GET"}): FetchError: request to https://firebase-public.firebaseio.com/cli.json failed, reason: Client network socket disconnected before secure TLS connection was established
+[warn] !  Unable to fetch the CLI MOTD and remote config. This is not a fatal error, but may indicate an issue with your network connection. 
+[debug] [2025-11-14T23:02:53.592Z] Failed to fetch MOTD FirebaseError: Failed to make request to https://firebase-public.firebaseio.com/cli.json
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2025-11-14T23:03:16.884Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-14T23:03:16.886Z] > authorizing via signed-in user (viajaconmemoya@gmail.com)
+[debug] [2025-11-14T23:03:16.895Z] Checked if tokens are valid: true, expires at: 1763163994909
+[debug] [2025-11-14T23:03:16.896Z] Checked if tokens are valid: true, expires at: 1763163994909
+[debug] [2025-11-14T23:03:16.898Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/viajaconmemo-app [none]
+[debug] [2025-11-14T23:03:17.516Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/viajaconmemo-app 403
+[debug] [2025-11-14T23:03:17.517Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/viajaconmemo-app "<!DOCTYPE html>\n<html lang=en>\n  <meta charset=utf-8>\n  <meta name=viewport content=\"initial-scale=1, minimum-scale=1, width=device-width\">\n  <title>Error 403 (Forbidden)!!1</title>\n  <style>\n    *{margin:0;padding:0}html,code{font:15px/22px arial,sans-serif}html{background:#fff;color:#222;padding:15px}body{margin:7% auto 0;max-width:390px;min-height:180px;padding:30px 0 15px}* > body{background:url(//www.google.com/images/errors/robot.png) 100% 5px no-repeat;padding-right:205px}p{margin:11px 0 22px;overflow:hidden}ins{color:#777;text-decoration:none}a img{border:0}@media screen and (max-width:772px){body{background:none;margin-top:0;max-width:none;padding-right:0}}#logo{background:url(//www.google.com/images/branding/googlelogo/1x/googlelogo_color_150x54dp.png) no-repeat;margin-left:-5px}@media only screen and (min-resolution:192dpi){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat 0% 0%/100% 100%;-moz-border-image:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) 0}}@media only screen and (-webkit-min-device-pixel-ratio:2){#logo{background:url(//www.google.com/images/branding/googlelogo/2x/googlelogo_color_150x54dp.png) no-repeat;-webkit-background-size:100% 100%}}#logo{display:inline-block;height:54px;width:150px}\n  </style>\n  <a href=//www.google.com/><span id=logo aria-label=Google></span></a>\n  <p><b>403.</b> <ins>That’s an error.</ins>\n  <p>Your client does not have permission to get URL <code>/v1beta1/projects/viajaconmemo-app</code> from this server.  <ins>That’s all we know.</ins>\n"
+[debug] [2025-11-14T23:03:17.518Z] Unable to parse JSON: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+[debug] [2025-11-14T23:03:17.522Z] FirebaseError: Unable to parse JSON: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+    at RetryOperation._fn (C:\Users\JUAN ARIEL\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:289:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[error] 
+[error] Error: Failed to get Firebase project viajaconmemo-app. Please make sure the project exists and your account has permission to access it.
+[debug] [2025-11-14T23:06:21.520Z] ----------------------------------------------------------------------
+[debug] [2025-11-14T23:06:21.545Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\JUAN ARIEL\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2025-11-14T23:06:21.547Z] CLI Version:   14.25.0
+[debug] [2025-11-14T23:06:21.548Z] Platform:      win32
+[debug] [2025-11-14T23:06:21.549Z] Node Version:  v20.19.5
+[debug] [2025-11-14T23:06:21.549Z] Time:          Fri Nov 14 2025 18:06:21 GMT-0500 (hora estándar de Cuba)
+[debug] [2025-11-14T23:06:21.550Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-14T23:06:21.560Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\JUAN ARIEL\Desktop\VIAJA CON MEMO
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2025-11-14T23:06:56.914Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-14T23:06:56.916Z] > authorizing via signed-in user (viajaconmemoya@gmail.com)
+[debug] [2025-11-14T23:06:56.920Z] Checked if tokens are valid: true, expires at: 1763163994909
+[debug] [2025-11-14T23:06:56.921Z] Checked if tokens are valid: true, expires at: 1763163994909
+[debug] [2025-11-14T23:06:56.927Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/viajaconmemo-app [none]
+[debug] [2025-11-14T23:07:08.176Z] *** [apiv2] error from fetch(https://firebase.googleapis.com/v1beta1/projects/viajaconmemo-app, {"headers":{},"method":"GET","signal":{"reason":""}}): FetchError: request to https://firebase.googleapis.com/v1beta1/projects/viajaconmemo-app failed, reason: getaddrinfo ENOTFOUND firebase.googleapis.com
+[debug] [2025-11-14T23:07:08.177Z] Failed to make request to https://firebase.googleapis.com/v1beta1/projects/viajaconmemo-app (original: request to https://firebase.googleapis.com/v1beta1/projects/viajaconmemo-app failed, reason: getaddrinfo ENOTFOUND firebase.googleapis.com)
+[debug] [2025-11-14T23:07:08.181Z] FirebaseError: Failed to make request to https://firebase.googleapis.com/v1beta1/projects/viajaconmemo-app
+    at RetryOperation._fn (C:\Users\JUAN ARIEL\AppData\Roaming\npm\node_modules\firebase-tools\lib\apiv2.js:271:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[error] 
+[error] Error: Failed to get Firebase project viajaconmemo-app. Please make sure the project exists and your account has permission to access it.
+[debug] [2025-11-14T23:15:04.412Z] ----------------------------------------------------------------------
+[debug] [2025-11-14T23:15:04.422Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\JUAN ARIEL\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2025-11-14T23:15:04.423Z] CLI Version:   14.25.0
+[debug] [2025-11-14T23:15:04.425Z] Platform:      win32
+[debug] [2025-11-14T23:15:04.425Z] Node Version:  v20.19.5
+[debug] [2025-11-14T23:15:04.426Z] Time:          Fri Nov 14 2025 18:15:04 GMT-0500 (hora estándar de Cuba)
+[debug] [2025-11-14T23:15:04.426Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-14T23:15:04.434Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\JUAN ARIEL\Desktop\VIAJA CON MEMO
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[debug] [2025-11-14T23:15:05.647Z] *** [apiv2] error from fetch(https://firebase-public.firebaseio.com/cli.json, {"headers":{},"method":"GET"}): FetchError: request to https://firebase-public.firebaseio.com/cli.json failed, reason: getaddrinfo ENOTFOUND firebase-public.firebaseio.com
+[warn] !  Unable to fetch the CLI MOTD and remote config. This is not a fatal error, but may indicate an issue with your network connection. 
+[debug] [2025-11-14T23:15:05.651Z] Failed to fetch MOTD FirebaseError: Failed to make request to https://firebase-public.firebaseio.com/cli.json
+[debug] [2025-11-14T23:23:53.325Z] ----------------------------------------------------------------------
+[debug] [2025-11-14T23:23:53.333Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\JUAN ARIEL\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2025-11-14T23:23:53.334Z] CLI Version:   14.25.0
+[debug] [2025-11-14T23:23:53.335Z] Platform:      win32
+[debug] [2025-11-14T23:23:53.335Z] Node Version:  v20.19.5
+[debug] [2025-11-14T23:23:53.336Z] Time:          Fri Nov 14 2025 18:23:53 GMT-0500 (hora estándar de Cuba)
+[debug] [2025-11-14T23:23:53.336Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-14T23:23:53.345Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\JUAN ARIEL\Desktop\VIAJA CON MEMO
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[debug] [2025-11-14T23:23:54.825Z] *** [apiv2] error from fetch(https://firebase-public.firebaseio.com/cli.json, {"headers":{},"method":"GET"}): FetchError: request to https://firebase-public.firebaseio.com/cli.json failed, reason: Client network socket disconnected before secure TLS connection was established
+[warn] !  Unable to fetch the CLI MOTD and remote config. This is not a fatal error, but may indicate an issue with your network connection. 
+[debug] [2025-11-14T23:23:54.830Z] Failed to fetch MOTD FirebaseError: Failed to make request to https://firebase-public.firebaseio.com/cli.json

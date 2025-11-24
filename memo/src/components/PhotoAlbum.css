@@ -1,0 +1,37 @@
+.photo-album {
+  padding: 20px;
+}
+
+.photo-album h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.photos-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.photo-card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+}
+
+.photo-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.photo-card h3 {
+  font-size: 1.2em;
+  margin: 10px;
+}
+
+.photo-card p {
+  margin: 0 10px 10px;
+  color: #555;
+}

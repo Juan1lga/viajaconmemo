@@ -1,0 +1,37 @@
+.package-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.package-form form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.package-form h2 {
+  margin-bottom: 1rem;
+}
+
+.package-form input, .package-form textarea {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.package-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.package-form button {
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}

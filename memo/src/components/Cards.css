@@ -1,0 +1,188 @@
+.cards {
+  padding: 4rem;
+  background: #fff;
+}
+
+h1 {
+  text-align: center;
+}
+
+.cards__container {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  max-width: 1120px;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.cards__wrapper {
+  position: relative;
+  margin: 50px 0 45px;
+}
+
+.cards__items {
+  margin-bottom: 24px;
+}
+
+.cards__item {
+  display: flex;
+  flex: 1;
+  margin: 0 1rem;
+  border-radius: 10px;
+  max-width: 280px; /* Au00f1adido para un diseu00f1o mu00e1s compacto */
+  .cards__item.package-wide{max-width:none;width:100%;margin:0}
+}
+
+.cards__item__link {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  box-shadow: 0 6px 20px rgba(56, 125, 255, 0.17);
+  -webkit-filter: drop-shadow(0 6px 20px rgba(56, 125, 255, 0.017));
+  filter: drop-shadow(0 6px 20px rgba(56, 125, 255, 0.017));
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.cards__item__pic-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 67%;
+  overflow: hidden;
+}
+
+.fade-img {
+  animation-name: fade-img;
+  animation-duration: 2s;
+}
+
+.cards__item__pic-wrap::after {
+  content: attr(data-category);
+  position: absolute;
+  bottom: 0;
+  margin-left: 10px;
+  padding: 6px 8px;
+  max-width: calc((100%) - 60px);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background-color: #1f98f4;
+  box-sizing: border-box;
+}
+
+.cards__item__img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  transition: all 0.2s linear;
+}
+
+/* Se elimina el hover individual de la imagen para favorecer la animaciu00f3n de la tarjeta completa */
+/* .cards__item__img:hover {
+  transform: scale(1.1);
+} */
+
+.cards__item__info {
+  padding: 20px 30px 30px;
+}
+
+.cards__item__text {
+  color: #252e48;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.cards__item__actions .btn {
+  color: #fff;
+  font-weight: 700;
+}
+
+.packages-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.packages-header h1 {
+  font-size: 56px;
+  color: #fff;
+  font-family: 'Georgia', serif;
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+}
+
+.packages-header p {
+  font-size: 18px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,.6);
+}
+
+.filter-buttons {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.filter-buttons button {
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  margin: 0 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.filter-buttons button.active {
+  background-color: #ff6f61;
+  color: white;
+}
+
+.filter-buttons button:hover {
+  background-color: #d4d4d4;
+}
+
+.filter-buttons button.active:hover {
+  background-color: #ff5a4c;
+}
+
+@media only screen and (min-width: 1200px) {
+  .content__blog__container {
+    width: 84%;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .cards__items {
+    display: flex;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .cards__item {
+    margin-bottom: 2rem;
+  }
+}
+.travel-card{position:relative;z-index:0}
+.travel-card .cards__item__link{transition:transform 220ms ease,box-shadow 220ms ease;will-change:transform,box-shadow}
+.travel-card:hover{z-index:2}
+.travel-card:hover .cards__item__link{transform:translateY(-6px) scale(1.02);box-shadow:0 12px 28px rgba(56,125,255,.25)}
+.travel-card:hover .cards__item__img{transform:scale(1.06)}
+.cards__item__link:focus-visible{outline:3px solid rgba(31,152,244,.6);outline-offset:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.package-card{animation:fadeUp 480ms ease both}
+.cards__items .package-card:nth-child(2){animation-delay:120ms}
+.cards__items .package-card:nth-child(3){animation-delay:180ms}
+.cards__items .package-card:nth-child(4){animation-delay:240ms}
+.cards__items .package-card:nth-child(5){animation-delay:300ms}
+.packages-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.packages-grid .cards__item{margin:0;max-width:none}
+@media only screen and (max-width:768px){.packages-grid{grid-template-columns:1fr}}

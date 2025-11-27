@@ -1,12 +1,17 @@
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 
-// Configurar Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Configurar Cloudinary (soporte CLOUDINARY_URL o variables separadas)
+if (process.env.CLOUDINARY_URL) {
+  cloudinary.config({ secure: true });
+} else {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true
+  });
+}
 
 // Función para subir un buffer a Cloudinary
 const uploadBuffer = (buffer, folder) => {

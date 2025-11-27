@@ -14,16 +14,23 @@ backend/uploads/
 backend/.env
 memo/.env
 memo/.env.production
+*.env
 
 # Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
+firebase-debug.log
 
 # Archivos de sistema
 .DS_Store
 Thumbs.db
 
 # Config Vercel
+.vercel/
 backend/.vercel/
 memo/.vercel/
+
+# Config Firebase
+.firebase/

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const path = require('path');
 const fs = require('fs').promises;
+const { uploadBuffer, deleteByUrl, isCloudinaryUrl } = require('../utils/cloudinary');
 
 
 // Obtener todos los trabajadores
@@ -26,10 +27,13 @@ exports.createWorker = async (req, res) => {
     }
 
     let photoUrl = '';
-    if (req.file && req.file.filename) {
-      photoUrl = `/uploads/${req.file.filename}`;
+    if (req.file && req.file.buffer) {
+      const result = await uploadBuffer(req.file.buffer, 'workers');
+      photoUrl = result.secure_url;
     } else if (typeof req.body.photo === 'string' && req.body.photo.trim()) {
       photoUrl = req.body.photo.trim();
+    } else if (typeof req.body.image === 'string' && req.body.image.trim()) {
+      photoUrl = req.body.image.trim();
     }
 
     const newWorker = new Worker({
@@ -56,6 +60,8 @@ exports.updateWorker = async (req, res) => {
   if (role) workerFields.role = role;
   if (!req.file && typeof req.body.photo === 'string' && req.body.photo.trim()) {
     workerFields.photo = req.body.photo.trim();
+  } else if (!req.file && typeof req.body.image === 'string' && req.body.image.trim()) {
+    workerFields.photo = req.body.image.trim();
   }
 
   try {
@@ -66,9 +72,12 @@ exports.updateWorker = async (req, res) => {
     let worker = await Worker.findById(id);
     if (!worker) return res.status(404).json({ msg: 'Trabajador no encontrado' });
 
-    if (req.file && req.file.filename) {
-      const newLocal = `/uploads/${req.file.filename}`;
-      if (worker.photo && worker.photo.includes('/uploads/')) {
+    if (req.file && req.file.buffer) {
+      const result = await uploadBuffer(req.file.buffer, 'workers');
+      // Borrar imagen anterior
+      if (worker.photo && isCloudinaryUrl(worker.photo)) {
+        try { await deleteByUrl(worker.photo); } catch (e) { console.error('No se pudo borrar imagen anterior de Cloudinary:', e.message); }
+      } else if (worker.photo && worker.photo.includes('/uploads/')) {
         try {
           const idx = worker.photo.indexOf('/uploads/');
           const rel = idx !== -1 ? worker.photo.slice(idx) : '';
@@ -78,7 +87,7 @@ exports.updateWorker = async (req, res) => {
           console.error('No se pudo borrar archivo local anterior:', e.message);
         }
       }
-      workerFields.photo = newLocal;
+      workerFields.photo = result.secure_url;
     }
 
     worker = await Worker.findByIdAndUpdate(
@@ -105,7 +114,9 @@ exports.deleteWorker = async (req, res) => {
     const worker = await Worker.findById(id);
     if (!worker) return res.status(404).json({ msg: 'Trabajador no encontrado' });
 
-    if (worker.photo && worker.photo.includes('/uploads/')) {
+    if (worker.photo && isCloudinaryUrl(worker.photo)) {
+      try { await deleteByUrl(worker.photo); } catch (e) { console.error('No se pudo eliminar foto del trabajador en Cloudinary:', e.message); }
+    } else if (worker.photo && worker.photo.includes('/uploads/')) {
       try {
         const idx = worker.photo.indexOf('/uploads/');
         const rel = idx !== -1 ? worker.photo.slice(idx) : '';

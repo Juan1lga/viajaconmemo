@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const path = require('path');
 const fs = require('fs').promises;
+const { uploadBuffer, deleteByUrl, isCloudinaryUrl } = require('../utils/cloudinary');
 
 
 exports.getPhotos = async (req, res) => {
@@ -21,15 +22,23 @@ exports.getPhotos = async (req, res) => {
 // Subir una foto
 exports.uploadPhoto = async (req, res) => {
   try {
-    const { title, description } = req.body;
-    if (!req.file) {
-      return res.status(400).json({ "error": "file_required", "message": "Adjunta una imagen en el campo \"image\"" });
+    const { title, description, image } = req.body;
+    let url = null;
+    let public_id = null;
+
+    if (req.file && req.file.buffer) {
+      const result = await uploadBuffer(req.file.buffer, 'photos');
+      url = result.secure_url;
+      public_id = result.public_id || null;
+    } else if (typeof image === 'string' && image.trim()) {
+      url = image.trim();
+    } else {
+      return res.status(400).json({ ok: false, "error": "file_required", "message": "Adjunta una imagen en el campo \"image\" o env\u00eda una URL v\u00e1lida en body.image" });
     }
-    const filename = req.file.filename || `${Date.now()}-${(req.file.originalname || 'image').replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-    const photoData = { title, description, imageUrl: `/uploads/${filename}`, url: `/uploads/${filename}` };
-    const photo = new Photo(photoData);
+
+    const photo = new Photo({ title, description, url });
     await photo.save();
-    res.status(201).json({ ok: true, message: "Foto subida exitosamente", photo });
+    res.status(201).json({ ok: true, url, public_id });
   } catch (err) {
     console.error('Error al subir foto:', err.message);
     res.status(500).json({ "error": "upload_failed", "detail": err.message });
@@ -90,9 +99,14 @@ exports.updatePhoto = async (req, res) => {
     if (req.body.description !== undefined) updateFields.description = req.body.description;
     if (req.body.approved !== undefined) updateFields.approved = toBoolean(req.body.approved);
 
-    if (req.file && req.file.filename) {
-      updateFields.imageUrl = `/uploads/${req.file.filename}`;
-      if (photo.imageUrl) {
+    if (req.file && req.file.buffer) {
+      // Subir nueva imagen a Cloudinary
+      const result = await uploadBuffer(req.file.buffer, 'photos');
+      updateFields.url = result.secure_url;
+      // Borrar imagen anterior si existía
+      if (photo && isCloudinaryUrl(photo.url)) {
+        try { await deleteByUrl(photo.url); } catch (e) { console.error('No se pudo borrar imagen anterior de Cloudinary:', e.message); }
+      } else if (photo && photo.imageUrl) {
         try {
           const localPath = path.join(__dirname, '..', photo.imageUrl.replace(/^\/+/, ''));
           await fs.unlink(localPath);
@@ -120,7 +134,9 @@ exports.deletePhoto = async (req, res) => {
     const photo = await Photo.findById(id);
     if (!photo) return res.status(404).json({ msg: 'Foto no encontrada' });
 
-    if (photo.imageUrl) {
+    if (photo.url && isCloudinaryUrl(photo.url)) {
+      try { await deleteByUrl(photo.url); } catch (e) { console.error('No se pudo borrar imagen de Cloudinary:', e.message); }
+    } else if (photo.imageUrl) {
       try {
         const localPath = path.join(__dirname, '..', photo.imageUrl.replace(/^\/+/, ''));
         await fs.unlink(localPath);

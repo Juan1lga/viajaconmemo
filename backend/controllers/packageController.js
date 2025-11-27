@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const path = require('path');
 const fs = require('fs').promises;
+const { uploadBuffer, deleteByUrl, isCloudinaryUrl } = require('../utils/cloudinary');
 
 
 // Obtener todos los paquetes
@@ -61,8 +62,9 @@ exports.createPackage = async (req, res) => {
     }
 
     let imageUrl;
-    if (req.file && req.file.filename) {
-      imageUrl = `/uploads/${req.file.filename}`;
+    if (req.file && req.file.buffer) {
+      const result = await uploadBuffer(req.file.buffer, 'packages');
+      imageUrl = result.secure_url;
     } else if (typeof image === 'string' && image.trim()) {
       imageUrl = image.trim();
     } else {
@@ -163,9 +165,12 @@ exports.updatePackage = async (req, res) => {
     let pkg = await Package.findById(id);
     if (!pkg) return res.status(404).json({ msg: 'Paquete no encontrado' });
 
-    if (req.file && req.file.filename) {
-      packageFields.image = `/uploads/${req.file.filename}`;
-      if (pkg.image && pkg.image.includes('/uploads/')) {
+    if (req.file && req.file.buffer) {
+      const result = await uploadBuffer(req.file.buffer, 'packages');
+      packageFields.image = result.secure_url;
+      if (pkg.image && isCloudinaryUrl(pkg.image)) {
+        try { await deleteByUrl(pkg.image); } catch (e) { console.error('No se pudo borrar imagen anterior de Cloudinary:', e.message); }
+      } else if (pkg.image && pkg.image.includes('/uploads/')) {
         try {
           const idx = pkg.image.indexOf('/uploads/');
           const rel = idx !== -1 ? pkg.image.slice(idx) : '';
@@ -199,7 +204,9 @@ exports.deletePackage = async (req, res) => {
     }
     const packageDoc = await Package.findById(id);
     if (!packageDoc) return res.status(404).json({ msg: 'Paquete no encontrado' });
-    if (packageDoc.image && packageDoc.image.includes('/uploads/')) {
+    if (packageDoc.image && isCloudinaryUrl(packageDoc.image)) {
+      try { await deleteByUrl(packageDoc.image); } catch (e) { console.error('Error al eliminar imagen de Cloudinary:', e.message); }
+    } else if (packageDoc.image && packageDoc.image.includes('/uploads/')) {
       try {
         const idx = packageDoc.image.indexOf('/uploads/');
         const rel = idx !== -1 ? packageDoc.image.slice(idx) : '';

@@ -1,0 +1,182 @@
+.package-details-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f7f6;
+  padding: 2rem;
+}
+
+.package-details-card {
+  display: flex;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 1100px;
+  width: 100%;
+}
+
+.package-image-section {
+  flex: 1.2;
+}
+
+.package-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.package-info-section {
+  flex: 1;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.package-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.package-description {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.package-meta {
+  margin-bottom: 1.5rem;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-title {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 0.25rem;
+}
+
+.meta-content {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.package-includes {
+  margin-bottom: 1.5rem;
+}
+
+.includes-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.75rem;
+}
+
+.includes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  columns: 2;
+  gap: 0.5rem;
+}
+
+.include-item {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.include-item::before {
+  content: '✓';
+  color: #27ae60;
+  margin-right: 0.5rem;
+  font-weight: bold;
+}
+
+.package-price-section {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.price-from {
+  font-size: 1rem;
+  color: #777;
+}
+
+.package-price {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #e67e22;
+}
+
+.price-currency {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #e67e22;
+}
+
+.whatsapp-button {
+  background-color: #25D366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.whatsapp-button:hover {
+  background-color: #128C7E;
+}
+
+.loading {
+  text-align: center;
+  padding: 5rem;
+  font-size: 1.5rem;
+}
+
+@media (max-width: 992px) {
+  .package-details-card {
+    flex-direction: column;
+  }
+  .package-info-section {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .package-details-container {
+    padding: 1rem;
+  }
+  .package-info-section {
+    padding: 1.5rem;
+  }
+  .package-title {
+    font-size: 2rem;
+  }
+  .includes-list {
+    columns: 1;
+  }
+  .package-price {
+    font-size: 2.2rem;
+  }
+}

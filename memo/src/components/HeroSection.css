@@ -1,0 +1,41 @@
+.hero-container {
+  height: 60vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.2);
+  object-fit: contain;
+  color: #fff;
+}
+
+.hero-container > h1 {
+  font-size: 4rem;
+  margin-top: 0;
+}
+
+.hero-container > p {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+}
+
+@media screen and (max-width: 960px) {
+  .hero-container > h1 {
+    font-size: 3rem;
+    margin-top: 0;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .hero-container > h1 {
+    font-size: 2.5rem;
+    margin-top: 0;
+  }
+
+  .hero-container > p {
+    font-size: 1.2rem;
+  }
+}

@@ -1,4 +1,4 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
-Sitemap: https://viajaconmemo.vercel.app/sitemap.xml
+Sitemap: https://www.viajaconmemoya.com/sitemap.xml

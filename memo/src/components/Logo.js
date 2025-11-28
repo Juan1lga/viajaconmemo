@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 
 const Logo = ({ size = "md", showText = false, imgClass = "" }) => {
-    const defaultLogo = "/memo-logo.jfif";
-    const backupLogo = "/logo192.png";
-    const publicLogo = process.env.REACT_APP_LOGO_URL || defaultLogo;
-  const [src, setSrc] = useState(publicLogo);
+  const defaultLogo = "/memo-logo.jfif";
+  const backupLogo = "/logo192.png";
+  const [src, setSrc] = useState(defaultLogo);
   const cls = `brand-logo ${size}`;
   return (
     <div className={cls} aria-label="Viaja con Memo logo">

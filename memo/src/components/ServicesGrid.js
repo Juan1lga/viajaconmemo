@@ -14,9 +14,9 @@ const imageMap = {
 const getImageSrc = (name) => {
   const fileName = imageMap[name];
   if (fileName) {
-    return `/servicios-jpg/${fileName}`;
+    return `${process.env.PUBLIC_URL}/servicios-jpg/${fileName}`;
   }
-  return `/assets/services/${name}.jpg`;
+  return `${process.env.PUBLIC_URL}/assets/services/${name}.jpg`;
 };
 
 

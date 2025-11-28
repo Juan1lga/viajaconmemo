@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const Logo = ({ size = "md", showText = false, imgClass = "" }) => {
-    const publicLogo = process.env.REACT_APP_LOGO_URL || '/memo-logo.jpg';
+    const publicLogo = process.env.REACT_APP_LOGO_URL || `${process.env.PUBLIC_URL}/memo-logo.jpg`;
   const [src, setSrc] = useState(publicLogo);
   const cls = `brand-logo ${size}`;
   return (

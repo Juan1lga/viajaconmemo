@@ -2,8 +2,8 @@ import React from "react";
 import "./AboutMemo.css";
 
 const AboutMemo = () => {
-  const imageSrc = "/memo.jpeg";
-  const fallbackSrc = process.env.REACT_APP_LOGO_URL || "/memo-logo.jpg";
+  const imageSrc = `${process.env.PUBLIC_URL}/memo.jpeg`;
+  const fallbackSrc = process.env.REACT_APP_LOGO_URL || `${process.env.PUBLIC_URL}/memo-logo.jpg`;
   return (
     <section className="about-memo" id="about-memo">
       <div className="about-memo__container">

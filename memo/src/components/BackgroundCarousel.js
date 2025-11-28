@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./BackgroundCarousel.css";
 
 const imageFiles = ["R.png", "Tours.jpg", "acapulco-baie.jpg", "europa.jfif", "europa2.jpg", "la-habana-2.jpg"];
-const images = imageFiles.map(file => `/imagenes-fondo/${file}`);
+const images = imageFiles.map(file => `${process.env.PUBLIC_URL}/imagenes-fondo/${file}`);
 
 const BackgroundCarousel = () => {
   const [index, setIndex] = useState(0);

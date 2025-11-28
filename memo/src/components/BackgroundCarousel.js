@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./BackgroundCarousel.css";
 
-import { assetsOrigin } from "../utils/api";
-const images = [
-  `${assetsOrigin}/uploads/1762491063215-downtown-taxco.jpg`,
-  `${assetsOrigin}/uploads/1762494155872-755804628-tizimin.jpg`,
-  `${assetsOrigin}/uploads/1762488270724-rawImage.jpg`
-];
+const images = ["/imagenes-fondo/R.png", "/imagenes-fondo/Tours.jpg", "/imagenes-fondo/acapulco-baie.jpg", "/imagenes-fondo/europa.jfif", "/imagenes-fondo/europa2.jpg", "/imagenes-fondo/la-habana-2.jpg"];
 
 const BackgroundCarousel = () => {
   const [index, setIndex] = useState(0);

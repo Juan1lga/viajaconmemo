@@ -46,7 +46,7 @@ const WorkerManagement = ({ token }) => {
       fd.append('name', formData.name);
       fd.append('role', formData.role);
       if (formData.photoFile) {
-        fd.append('photo', formData.photoFile);
+        fd.append('image', formData.photoFile);
       }
 
 

@@ -1,9 +1,10 @@
 import React from "react";
 import "./AboutMemo.css";
+import memoImage from "../assets/memo.jpeg";
 
 const AboutMemo = () => {
-  const imageSrc = "/memo-logo.jpg";
-  const fallbackSrc = "/memo-logo.jpg";
+  const imageSrc = memoImage;
+  const fallbackSrc = process.env.REACT_APP_LOGO_URL || "/memo-logo.jpg";
   return (
     <section className="about-memo" id="about-memo">
       <div className="about-memo__container">

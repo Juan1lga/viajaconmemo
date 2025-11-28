@@ -28,8 +28,14 @@ exports.createWorker = async (req, res) => {
 
     let photoUrl = '';
     if (req.file && req.file.buffer) {
-      const result = await uploadBuffer(req.file.buffer, 'workers');
-      photoUrl = result.secure_url;
+      try {
+        const result = await uploadBuffer(req.file.buffer, 'workers');
+        photoUrl = result.secure_url;
+      } catch (uploadError) {
+        console.error('Error al subir la imagen a Cloudinary:', uploadError);
+        // Decide si quieres detener el proceso o continuar sin una foto
+        // En este caso, continuaremos sin foto, pero registraremos el error.
+      }
     } else if (typeof req.body.photo === 'string' && req.body.photo.trim()) {
       photoUrl = req.body.photo.trim();
     } else if (typeof req.body.image === 'string' && req.body.image.trim()) {
@@ -45,8 +51,8 @@ exports.createWorker = async (req, res) => {
     const worker = await newWorker.save();
     res.json(worker);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Error del servidor');
+    console.error('Error al crear el trabajador:', err.message);
+    res.status(500).send('Error del servidor al crear el trabajador');
   }
 };
 

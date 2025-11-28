@@ -3,10 +3,10 @@ import "./ServicesGrid.css";
 import homeContent from "../content/home.json";
 
 const imageMap = {
-  "avion": "boletos-avion.jpg",
-  "hotel": "hospedaje.png",
+  "avion": "boletos-avion.jfif",
+  "hotel": "hospedaje.jfif",
   "traslados": "traslados.jfif",
-  "tours": "Tours.jpg",
+  "tours": "tours.jfif",
   "paquetes": "paquetes.jfif",
   "asistencia": "asistencia.jfif"
 };
@@ -16,7 +16,7 @@ const getImageSrc = (name) => {
   if (fileName) {
     return `${process.env.PUBLIC_URL}/servicios-jpg/${fileName}`;
   }
-  return `${process.env.PUBLIC_URL}/assets/services/${name}.jpg`;
+  return `${process.env.PUBLIC_URL}/servicios-jpg/${name}.jfif`;
 };
 
 

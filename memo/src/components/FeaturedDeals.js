@@ -33,7 +33,7 @@ const FeaturedDeals = () => {
               <CardItem
                 key={deal._id}
                 itemClass='travel-card package-card'
-                src={(deal.image && deal.image.startsWith('/uploads/')) ? `${assetsOrigin}${deal.image}` : (deal.image || 'images/img-default.jpg')}
+                src={(deal.image && deal.image.startsWith('/uploads/')) ? `${assetsOrigin}${deal.image}` : (deal.image || `${process.env.PUBLIC_URL}/memo-logo.jfif`)}
                 text={deal.description}
                 label={deal.name}
                 path={`/packages/${deal._id}`}

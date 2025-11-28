@@ -2,9 +2,15 @@ const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 
 // Configurar Cloudinary (soporte CLOUDINARY_URL o variables separadas)
-if (process.env.CLOUDINARY_URL) {
-  cloudinary.config({ secure: true });
-} else {
+const isConfigured = process.env.CLOUDINARY_URL || 
+  (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET);
+
+if (!isConfigured) {
+  console.error('ERROR CRÍTICO: Cloudinary no está configurado. Faltan las variables de entorno CLOUDINARY_URL o las variables CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET.');
+  // Lanza un error para detener la aplicación si Cloudinary es esencial
+  throw new Error('La configuración de Cloudinary es obligatoria para el funcionamiento de la aplicación.');
+} else if (!process.env.CLOUDINARY_URL) {
+  // Solo configurar manualmente si CLOUDINARY_URL no está presente
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -15,6 +21,9 @@ if (process.env.CLOUDINARY_URL) {
 
 // Función para subir un buffer a Cloudinary
 const uploadBuffer = (buffer, folder) => {
+  if (!isConfigured) {
+    return Promise.reject(new Error('Cloudinary no está configurado. No se pueden subir archivos.'));
+  }
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       { folder: folder },

@@ -20,7 +20,7 @@ const Team = () => {
 
   const buildPhotoSrc = (photo) => {
     if (!photo) return 'https://via.placeholder.com/150?text=Avatar';
-    return photo.startsWith('/uploads/') ? `${assetsOrigin}${photo}` : photo;
+    return photo; // Asumimos que la API devuelve una URL completa
   };
 
   return (

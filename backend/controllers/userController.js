@@ -58,3 +58,35 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ msg: 'Error del servidor' });
   }
 };
+
+// Actualizar un usuario (solo para administradores)
+exports.updateUser = async (req, res) => {
+  const { id } = req.params;
+  const { email, password, isAdmin } = req.body;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: 'ID de usuario inválido' });
+    }
+
+    let user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ msg: 'Usuario no encontrado' });
+    }
+
+    // Actualizar campos
+    if (email) user.email = email;
+    if (isAdmin !== undefined) user.isAdmin = isAdmin;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
+
+    await user.save();
+
+    res.json({ msg: 'Usuario actualizado exitosamente' });
+  } catch (err) {
+    console.error('Error al actualizar usuario:', err.message);
+    res.status(500).send('Error del servidor');
+  }
+};

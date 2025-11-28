@@ -4,7 +4,7 @@ import homeContent from "../content/home.json";
 
 const imageMap = {
   "avion": "boletos-avion.jpg",
-  "hotel": "hospedaje.jpg.png",
+  "hotel": "hospedaje.png",
   "traslados": "traslados.jfif",
   "tours": "Tours.jpg",
   "paquetes": "paquetes.jfif",
@@ -13,7 +13,10 @@ const imageMap = {
 
 const getImageSrc = (name) => {
   const fileName = imageMap[name];
-  return fileName ? `/servicios-jpg/${fileName}` : `/assets/services/${name}.jpg`;
+  if (fileName) {
+    return `/servicios-jpg/${fileName}`;
+  }
+  return `/assets/services/${name}.jpg`;
 };
 
 

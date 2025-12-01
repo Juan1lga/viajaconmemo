@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./BackgroundCarousel.css";
 
 const imageFiles = ["R (2).jfif", "Tours.jfif", "acapulco-baie.jfif", "europa.jfif", "europa2.jfif", "la-habana-2.jfif"];
-const images = imageFiles.map(file => `/imagenes-fondo/${file}`);
-const fallback = "/memo-logo.jfif";
+const version = "?v=2";
+const images = imageFiles.map(file => `/imagenes-fondo/${file}${version}`);
+const fallback = `/memo-logo.jfif${version}`;
 
 const BackgroundCarousel = () => {
   const [slides, setSlides] = useState([fallback]);

@@ -2,8 +2,8 @@ import React from "react";
 import "./AboutMemo.css";
 
 const AboutMemo = () => {
-  const imageSrc = `${process.env.PUBLIC_URL}/memo.jfif`;
-  const fallbackSrc = process.env.REACT_APP_LOGO_URL || `${process.env.PUBLIC_URL}/memo-logo.jfif`;
+  const imageSrc = `${process.env.PUBLIC_URL}/memo.jfif?v=2`;
+  const fallbackSrc = process.env.REACT_APP_LOGO_URL || `${process.env.PUBLIC_URL}/memo-logo.jfif?v=2`;
   return (
     <section className="about-memo" id="about-memo">
       <div className="about-memo__container">

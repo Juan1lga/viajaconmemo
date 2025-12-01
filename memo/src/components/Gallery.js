@@ -31,8 +31,8 @@ const Gallery = () => {
   const items = (photos && photos.length
     ? photos.map((p) => ({ src: p.url || `${assetsOrigin}${p.imageUrl}`, title: p.title, description: p.description }))
     : [
-        { src: "/logo512.png", title: "Ejemplo 1", description: "Imagen de ejemplo" },
-        { src: "/logo192.png", title: "Ejemplo 2", description: "Imagen de ejemplo" }
+        { src: "/logo512.png?v=2", title: "Ejemplo 1", description: "Imagen de ejemplo" },
+        { src: "/logo192.png?v=2", title: "Ejemplo 2", description: "Imagen de ejemplo" }
       ]);
 
   if (loading) return <div className="loading">Cargando galería...</div>;

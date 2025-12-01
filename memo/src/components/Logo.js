@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const Logo = ({ size = "md", showText = false, imgClass = "" }) => {
-  const defaultLogo = "/memo-logo.jfif";
+  const defaultLogo = "/memo-logo.jfif?v=2";
   const backupLogo = "/logo192.png";
   const [src, setSrc] = useState(defaultLogo);
   const cls = `brand-logo ${size}`;

@@ -7,12 +7,13 @@ const TypewriterTitle = ({ text = "", speed = 150 }) => {
   useEffect(() => {
     setShown("");
     idxRef.current = 0;
+    if (!text) return;
     const interval = setInterval(() => {
       if (idxRef.current >= text.length) {
         clearInterval(interval);
         return;
       }
-      setShown((prev) => prev + text.charAt(idxRef.current));
+      setShown(text.slice(0, idxRef.current + 1));
       idxRef.current += 1;
     }, speed);
     return () => clearInterval(interval);

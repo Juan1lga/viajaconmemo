@@ -21,7 +21,8 @@ console.log(`Entorno: ${isProd ? 'production' : 'development'}`);
 const app = express();
 
 // Middleware
-const baseOrigins = [CORS_ORIGIN,'https://viajaconmemoya.com','https://www.viajaconmemoya.com'].filter(Boolean);
+const envOrigins = (CORS_ORIGIN || '').split(',').map(o => o.trim()).filter(Boolean);
+const baseOrigins = [...envOrigins,'https://viajaconmemoya.com','https://www.viajaconmemoya.com'];
 const localOrigins = ['http://localhost:3000','http://127.0.0.1:3000','http://localhost:3001','http://localhost:5000','http://127.0.0.1:5000','http://localhost:5173','http://127.0.0.1:5173','http://localhost:4173','http://127.0.0.1:4173','http://localhost:8080','http://127.0.0.1:8080'];
 const allowedOrigins = isProd ? baseOrigins : baseOrigins.concat(localOrigins);
 const corsOptions = {
@@ -42,22 +43,19 @@ const corsOptions = {
   credentials: true
 };
 app.use(cors(corsOptions));
-app.use((req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  next();
-});
-
 app.use(express.json());
+
+// Desactivar buffer de comandos para no encolar operaciones cuando la DB está desconectada
+mongoose.set('bufferCommands', false);
 
 // Conexión a la base de datos
 const connectDB = async () => {
   try {
     console.log('Conectando a MongoDB...');
     await mongoose.connect(MONGO_URI, {
-      serverSelectionTimeoutMS: 10000,
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 30000,
+      connectTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
       family: 4
     });
     isConnected = true;
@@ -73,12 +71,14 @@ let isConnected = false;
 
 // Eventos de conexión de Mongoose
 mongoose.connection.on('connected', () => {
+  isConnected = true;
   console.log('Evento: Mongoose conectado');
 });
 mongoose.connection.on('error', (err) => {
   console.error('Evento: Error de Mongoose:', (err && err.message) ? err.message : err);
 });
 mongoose.connection.on('disconnected', () => {
+  isConnected = false;
   console.warn('Evento: Mongoose desconectado');
 });
 
@@ -87,6 +87,12 @@ const connectPromise = connectDB();
 
 
 // Rutas
+app.use('/api', (req, res, next) => {
+  if (!isConnected) {
+    return res.status(503).json({ error: 'Servicio temporalmente no disponible', detail: 'Sin conexión a la base de datos', retryAfterMs: 5000 });
+  }
+  next();
+});
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/packages', require('./routes/packages'));
 app.use('/api/photos', require('./routes/photos'));
@@ -94,25 +100,35 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/workers', require('./routes/workers'));
 app.use('/api/payments', require('./routes/payments'));
 
-// Servir archivos estáticos solo en desarrollo
-if (!isProd) {
-  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-}
+// Servir archivos estáticos
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.get('/', (req, res) => {
-  res.send('API de Viaja con Memo');
-});
+// Health route
 app.get('/health', (req, res) => {
   const state = mongoose.connection.readyState;
   res.json({ status: 'ok', db: { connected: isConnected, readyState: state } });
 });
 
+// Servir frontend estático en producción
+if (isProd) {
+  const buildDir = path.join(__dirname, '../memo/build');
+  app.use(express.static(buildDir));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(buildDir, 'index.html'));
+  });
+}
+
+if (!isProd) {
+  app.get('/', (req, res) => {
+    res.send('API de Viaja con Memo');
+  });
+}
 const PORT = process.env.PORT || 5000;
 
 if (require.main === module) {
   (async () => {
     await connectPromise;
-    app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+    app.listen(PORT, '0.0.0.0', () => console.log(`Servidor corriendo en puerto ${PORT}`));
   })();
 }
 

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const path = require('path');
 const fs = require('fs').promises;
-const { uploadBuffer, deleteByUrl, isCloudinaryUrl } = require('../utils/cloudinary');
+const { configured, uploadBuffer, deleteByUrl, isCloudinaryUrl } = require('../utils/cloudinary');
 
 
 exports.getPhotos = async (req, res) => {
@@ -27,13 +27,14 @@ exports.uploadPhoto = async (req, res) => {
     let public_id = null;
 
     if (req.file && req.file.buffer) {
+      if (!configured) { return res.status(503).json({ error: 'cloudinary_not_configured', message: 'Cloudinary no está disponible para subir imágenes' }); }
       const result = await uploadBuffer(req.file.buffer, 'photos');
       url = result.secure_url;
       public_id = result.public_id || null;
     } else if (typeof image === 'string' && image.trim()) {
       url = image.trim();
     } else {
-      return res.status(400).json({ ok: false, "error": "file_required", "message": "Adjunta una imagen en el campo \"image\" o env\u00eda una URL v\u00e1lida en body.image" });
+      return res.status(400).json({ ok: false, "error": "file_required", "message": "Adjunta una imagen en el campo \"image\" o envía una URL válida en body.image" });
     }
 
     const photo = new Photo({ title, description, url });
@@ -100,6 +101,7 @@ exports.updatePhoto = async (req, res) => {
     if (req.body.approved !== undefined) updateFields.approved = toBoolean(req.body.approved);
 
     if (req.file && req.file.buffer) {
+      if (!configured) { return res.status(503).json({ error: 'cloudinary_not_configured', message: 'Cloudinary no está disponible para subir imágenes' }); }
       // Subir nueva imagen a Cloudinary
       const result = await uploadBuffer(req.file.buffer, 'photos');
       updateFields.url = result.secure_url;
@@ -135,6 +137,7 @@ exports.deletePhoto = async (req, res) => {
     if (!photo) return res.status(404).json({ msg: 'Foto no encontrada' });
 
     if (photo.url && isCloudinaryUrl(photo.url)) {
+      if (!configured) { return res.status(503).json({ error: 'cloudinary_not_configured', message: 'Cloudinary no está disponible para eliminar imágenes' }); }
       try { await deleteByUrl(photo.url); } catch (e) { console.error('No se pudo borrar imagen de Cloudinary:', e.message); }
     } else if (photo.imageUrl) {
       try {

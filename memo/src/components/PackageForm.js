@@ -10,6 +10,13 @@ const PackageForm = ({ token }) => {
   const [image, setImage] = useState('');
   const [price, setPrice] = useState('');
   // nuevos campos
+  const [currency, setCurrency] = useState('USD');
+  const [priceDouble, setPriceDouble] = useState('');
+  const [priceChild, setPriceChild] = useState('');
+  const [priceAdult, setPriceAdult] = useState('');
+  const [priceDoubleLabel, setPriceDoubleLabel] = useState('Base doble');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [duration, setDuration] = useState('');
   const [category, setCategory] = useState('Populares');
   const [includesInput, setIncludesInput] = useState('');
@@ -29,13 +36,28 @@ const PackageForm = ({ token }) => {
         setPrice(pkg.price);
         setImage(pkg.image);
         setDuration(pkg.duration || '');
-        setCategory((pkg.category === 'Popular' || pkg.category === 'Populares' || pkg.category === 'Lujo' || pkg.category === 'Económicos') ? (pkg.category === 'Popular' ? 'Populares' : pkg.category) : 'Populares');
+        setCategory((pkg.category === 'Popular' || pkg.category === 'Populares' || pkg.category === 'Lujo' || pkg.category === 'Económicos' || pkg.category === 'Ofertas de fin de semana') ? (pkg.category === 'Popular' ? 'Populares' : pkg.category) : 'Populares');
         setIncludesInput(Array.isArray(pkg.includes) ? pkg.includes.join(', ') : (pkg.includes || ''));
         setPopular(Boolean(pkg.popular));
+        setCurrency((pkg.currency === 'MXN' || pkg.currency === 'USD') ? pkg.currency : 'USD');
+        setPriceDouble(pkg.priceDouble != null ? String(pkg.priceDouble) : '');
+        setPriceChild(pkg.priceChild != null ? String(pkg.priceChild) : '');
+        setPriceAdult(pkg.priceAdult != null ? String(pkg.priceAdult) : '');
+        setPriceDoubleLabel((typeof pkg.priceDoubleLabel === 'string' && pkg.priceDoubleLabel.trim()) ? pkg.priceDoubleLabel : 'Base doble');
+        try {
+          const sd = pkg.startDate ? new Date(pkg.startDate) : null;
+          const ed = pkg.endDate ? new Date(pkg.endDate) : null;
+          const toInput = (d) => d ? new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10) : '';
+          setStartDate(sd ? toInput(sd) : '');
+          setEndDate(ed ? toInput(ed) : '');
+        } catch (_) {}
+
       };
       fetchPackage();
     }
   }, [id]);
+
+  const modality = priceDoubleLabel || 'Base doble';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,10 +65,18 @@ const PackageForm = ({ token }) => {
     formData.append('name', name);
     formData.append('description', description);
     formData.append('price', price);
+    formData.append('currency', currency);
+    formData.append('priceDouble', priceDouble);
+    formData.append('priceChild', priceChild);
+    formData.append('priceAdult', priceAdult);
+    formData.append('priceDoubleLabel', priceDoubleLabel);
+    formData.append('startDate', startDate);
+    formData.append('endDate', endDate);
     formData.append('duration', duration);
     formData.append('category', category);
     formData.append('includes', includesInput);
     formData.append('popular', popular);
+    formData.append('itinerary', description);
 
     if (id) {
       if (imageFile) {
@@ -95,8 +125,35 @@ const PackageForm = ({ token }) => {
             <input type='text' className='form-control' placeholder='Nombre' value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div className="col-md-6">
-            <label className="form-label">Precio (USD)</label>
-            <input type='number' className='form-control' placeholder='Precio' value={price} onChange={(e) => setPrice(e.target.value)} required step='0.01' min='0' />
+            <label className="form-label">Moneda</label>
+            <select className='form-select' value={currency} onChange={(e) => setCurrency(e.target.value)}>
+              <option value='USD'>USD (Dólares)</option>
+              <option value='MXN'>MXN (Pesos mexicanos)</option>
+            </select>
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Precio general</label>
+            <input type='number' className='form-control' placeholder='Precio' value={price} onChange={(e) => setPrice(e.target.value)} step='0.01' min='0' />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">{`Precio ${modality}`}</label>
+            <input type='number' className='form-control' placeholder={`Precio ${modality}`} value={priceDouble} onChange={(e) => setPriceDouble(e.target.value)} step='0.01' min='0' />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Precio para niños</label>
+            <input type='number' className='form-control' placeholder='Precio niños' value={priceChild} onChange={(e) => setPriceChild(e.target.value)} step='0.01' min='0' />
+          </div>
+           <div className="col-md-6">
+            <label className="form-label">Modalidad de pago</label>
+            <select className='form-select' value={priceDoubleLabel} onChange={(e) => setPriceDoubleLabel(e.target.value)}>
+              <option value='Base sencilla'>Base sencilla</option>
+              <option value='Base doble'>Base doble</option>
+              <option value='Base triple'>Base triple</option>
+            </select>
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Precio para adultos</label>
+            <input type='number' className='form-control' placeholder='Precio adultos' value={priceAdult} onChange={(e) => setPriceAdult(e.target.value)} step='0.01' min='0' />
           </div>
           <div className="col-md-6">
             <label className="form-label">Duración</label>
@@ -108,11 +165,20 @@ const PackageForm = ({ token }) => {
               <option value='Populares'>Populares</option>
               <option value='Lujo'>Lujo</option>
               <option value='Económicos'>Económicos</option>
+              <option value='Ofertas de fin de semana'>Ofertas de fin de semana</option>
             </select>
           </div>
           <div className="col-12">
-            <label className="form-label">Descripción</label>
-            <textarea className='form-control' placeholder='Descripción' value={description} onChange={(e) => setDescription(e.target.value)} required rows={3}></textarea>
+            <label className="form-label">Itinerario</label>
+            <textarea className='form-control' placeholder='Describe el itinerario detallado' value={description} onChange={(e) => setDescription(e.target.value)} required rows={4}></textarea>
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Fecha inicio</label>
+            <input type='date' className='form-control' value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          </div>
+          <div className="col-md-6">
+            <label className="form-label">Fecha fin</label>
+            <input type='date' className='form-control' value={endDate} onChange={(e) => setEndDate(e.target.value)} />
           </div>
           <div className="col-md-6">
             <label className="form-label">URL de la Imagen</label>

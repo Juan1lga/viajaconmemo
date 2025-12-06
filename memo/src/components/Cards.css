@@ -31,8 +31,9 @@ h1 {
   margin: 0 1rem;
   border-radius: 10px;
   max-width: 280px; /* Au00f1adido para un diseu00f1o mu00e1s compacto */
-  .cards__item.package-wide{max-width:none;width:100%;margin:0}
 }
+
+.cards__item.package-wide{max-width:none;width:100%;margin:0}
 
 .cards__item__link {
   display: flex;

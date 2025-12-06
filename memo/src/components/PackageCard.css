@@ -1,13 +1,14 @@
 /* Contenedor principal de la tarjeta */
-.package-card{display:flex;gap:16px;align-items:stretch;background:#fff;border-radius:16px;box-shadow:0 6px 20px rgba(56,125,255,.17);overflow:hidden;padding:12px;transition:transform 220ms ease,box-shadow 220ms ease;width:100%}
+.package-card{display:flex;flex-direction:column;gap:16px;align-items:stretch;background:#fff;border-radius:16px;box-shadow:0 6px 20px rgba(56,125,255,.17);overflow:hidden;padding:12px;transition:transform 220ms ease,box-shadow 220ms ease;width:100%}
 .package-card-horizontal{flex-direction:row}
+.package-card-horizontal .pkg-image{flex:0 0 340px;width:340px;height:220px}
 
 /* Imagen */
-.pkg-image{flex:0 0 280px;position:relative;border-radius:12px;overflow:hidden}
-.pkg-image img{width:100%;height:100%;object-fit:cover;display:block}
+.pkg-image{flex:0 0 auto;position:relative;border-radius:12px;overflow:hidden;cursor:pointer;width:100%;height:220px}
+.pkg-image img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
 
 /* Info */
-.pkg-info{flex:1;display:flex;flex-direction:column;padding:8px 4px}
+.pkg-info{flex:1;display:flex;flex-direction:column;padding:8px 4px;position:relative;z-index:1;color:#1f2937}
 .pkg-title{font-size:1.4rem;font-weight:700;color:#252e48;margin:0 0 6px}
 .pkg-duration{color:#e26d5c;font-weight:600;margin-bottom:8px}
 .pkg-desc{color:#4a5568;line-height:1.5;margin:0 0 10px}
@@ -21,10 +22,13 @@
 /* Footer precio + CTA */
 .pkg-footer{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .pkg-price{display:flex;align-items:baseline;gap:6px}
-.pkg-price .from{color:#718096;display:block;font-size:.75rem}
-.pkg-price .amount{color:#e67e22;font-size:1.6rem;font-weight:800}
+.pkg-price .from{color:#718096;display:block;font-size:.55rem}
+.pkg-price .amount{color:#e67e22;font-size:1.2rem;font-weight:800}
 .btn-cta{background:#e26d5c;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;text-decoration:none;transition:background .2s ease}
 .btn-cta:hover{background:#d35b4a}
+.btn-cta.cta-small{font-size:.7rem;padding:4px 8px;border-radius:10px}
+.btn-cta.cta-xs{font-size:.68rem;padding:4px 8px;border-radius:10px}
+.btn-cta.cta-xxs{font-size:.62rem;padding:3px 7px;border-radius:10px}
 
 /* Hover y entrada: consistente con travel-card */
 .package-card.travel-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 12px 28px rgba(56,125,255,.25)}
@@ -36,6 +40,19 @@
 /* Responsive */
 @media(max-width:768px){
   .package-card{flex-direction:column}
-  .pkg-image{flex:0 0 auto;height:200px}
+  .pkg-image{flex:0 0 auto;height:200px;width:100%}
+  .pkg-prices{grid-template-columns:1fr}
 }
-.package-card.compact{max-width:560px;margin:0 auto}
+.package-card.compact{max-width:560px;margin:0 auto;flex-direction:column}
+/* Precios con badges de color */
+.pkg-prices{display:grid;grid-template-columns:1fr;gap:8px;margin:6px 0}
+.pkg-prices .price-row{width:100%;justify-self:stretch;gap:10px;padding:6px 10px;font-size:.68rem}
+.price-row{display:flex;align-items:center;justify-content:space-between;border-radius:9999px;padding:6px 12px;font-weight:600;color:#fff;gap:8px}
+.price-row span:last-child{font-size:clamp(.72rem,.9vw,.88rem);font-weight:700;line-height:1;margin-left:8px;letter-spacing:.01em}
+.price-row span:first-child{opacity:.95;font-size:.74rem;letter-spacing:.02em}
+.price-row.double{background:#0cec04}
+.price-row.general{background:#43a047}
+.price-row.child{background:#fb8c00}
+.price-row.adult{background:#50990b}
+/* Imagen compacta uniforme */
+.package-card.compact .pkg-image{height:200px;flex:0 0 auto;width:100%}

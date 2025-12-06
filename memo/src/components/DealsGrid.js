@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../utils/api";
-import DealCard from "./DealCard";
+import PackageCard from "./PackageCard";
 import "./Deals.css";
 
 const DealsGrid = () => {
@@ -26,16 +26,19 @@ const DealsGrid = () => {
   return (
     <section className="deals-grid">
       <div className="deals-header">
-        <h2>Ofertas de última hora para el fin de semana</h2>
-        <Link to="/paquetes" className="btn-cta">Ver todas las ofertas</Link>
+        <h2>Explora nuestros paquetes</h2>
+        <Link to="/paquetes" className="btn-cta">Ver todos los paquetes</Link>
       </div>
       {loading && <div className="loader">Cargando ofertas...</div>}
       {!loading && error && <div className="error">{error}</div>}
       {!loading && !error && (
         <div className="deals-list">
-          {packages.map((pkg) => (
-            <DealCard key={pkg._id} pkg={pkg} />
-          ))}
+          {packages
+            .filter(p => p.popular === true || p.category === 'Populares')
+            .slice(0, 8)
+            .map((pkg) => (
+              <PackageCard key={pkg._id} pkg={pkg} className="package-card" />
+            ))}
         </div>
       )}
     </section>

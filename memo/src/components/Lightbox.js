@@ -28,7 +28,7 @@ const Lightbox = ({ images = [], startIndex = 0, onClose }) => {
     <div className="lightbox-overlay" role="dialog" aria-modal="true" onClick={onClose}>
       <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
         <button className="lb-btn lb-prev" aria-label="Atrás" onClick={handlePrev}>‹</button>
-        <img className="lightbox-image" src={current.src} alt={current.title || "Imagen"} />
+        <img className="lightbox-image" src={current.src} alt={current.title || "Imagen"} onClick={onClose} />
         <button className="lb-btn lb-next" aria-label="Siguiente" onClick={handleNext}>›</button>
         <button className="lb-close" aria-label="Cerrar" onClick={onClose}>✕</button>
         {(current.title || current.description) && (

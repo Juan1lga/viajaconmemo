@@ -3,14 +3,25 @@ const mongoose = require('mongoose');
 
 const path = require('path');
 const fs = require('fs').promises;
-const { uploadBuffer, deleteByUrl, isCloudinaryUrl } = require('../utils/cloudinary');
+const { configured, uploadBuffer, deleteByUrl, isCloudinaryUrl } = require('../utils/cloudinary');
 
 
 // Obtener todos los paquetes
 
 exports.getPackages = async (req, res) => {
   try {
-    const packages = await Package.find().lean();
+    const filter = {};
+    const { category, popular } = req.query || {};
+    if (typeof category === 'string' && category.trim()) {
+      const cat = category.trim();
+      const normalized = (cat === 'Popular') ? 'Populares' : cat;
+      const allowed = ['Populares','Lujo','Económicos','Ofertas de fin de semana'];
+      if (allowed.includes(normalized)) filter.category = normalized;
+    }
+    if (popular === 'true') filter.popular = true;
+    if (popular === 'false') filter.popular = false;
+
+    const packages = await Package.find(filter).lean();
     res.json(packages);
   } catch (err) {
     console.error('getPackages failed:', err);
@@ -36,20 +47,45 @@ exports.getPackageById = async (req, res) => {
 // Crear un paquete
 exports.createPackage = async (req, res) => {
   try {
-    const { name, description, price, duration, category, includes, isPopular, popular, image } = req.body;
+    const { name, description, price, currency, priceDouble, priceDoubleLabel, priceChild, priceAdult, duration, startDate, endDate, category, includes, itinerary, isPopular, popular, image, mainPhotoUrl } = req.body;
 
-    if (!name || !description) {
-      return res.status(400).json({ msg: 'Nombre y descripción son requeridos' });
+    if (!name) {
+      return res.status(400).json({ msg: 'El nombre es requerido' });
     }
 
-    if (price === undefined || price === null || price === '') {
-      return res.status(400).json({ msg: 'El precio es requerido' });
+    const providedPrices = [price, priceDouble, priceChild].filter(v => v !== undefined && v !== null && v !== '');
+    if (providedPrices.length === 0) {
+      return res.status(400).json({ msg: 'Al menos un precio (general, base doble o niños) es requerido' });
     }
 
-    const numericPrice = Number(price);
-    if (Number.isNaN(numericPrice)) {
+    const numericPrice = (price !== undefined && price !== null && price !== '') ? Number(price) : undefined;
+    if (numericPrice !== undefined && Number.isNaN(numericPrice)) {
       return res.status(400).json({ msg: 'El precio debe ser un número' });
     }
+    const numericDouble = (priceDouble !== undefined && priceDouble !== null && priceDouble !== '') ? Number(priceDouble) : undefined;
+    if (numericDouble !== undefined && Number.isNaN(numericDouble)) {
+      return res.status(400).json({ msg: 'El precio base doble debe ser un número' });
+    }
+    const numericChild = (priceChild !== undefined && priceChild !== null && priceChild !== '') ? Number(priceChild) : undefined;
+    if (numericChild !== undefined && Number.isNaN(numericChild)) {
+      return res.status(400).json({ msg: 'El precio para niños debe ser un número' });
+    }
+    const numericAdult = (priceAdult !== undefined && priceAdult !== null && priceAdult !== '') ? Number(priceAdult) : undefined;
+    if (numericAdult !== undefined && Number.isNaN(numericAdult)) {
+      return res.status(400).json({ msg: 'El precio para adultos debe ser un número' });
+    }
+
+    const parseDate = (val) => {
+      if (!val) return undefined;
+      try {
+        const d = new Date(val);
+        return Number.isNaN(d.getTime()) ? undefined : d;
+      } catch {
+        return undefined;
+      }
+    };
+    const start = parseDate(startDate);
+    const end = parseDate(endDate);
 
     let includesArray = [];
     if (Array.isArray(includes)) {
@@ -63,6 +99,7 @@ exports.createPackage = async (req, res) => {
 
     let imageUrl;
     if (req.file && req.file.buffer) {
+      if (!configured) { return res.status(503).json({ error: 'cloudinary_not_configured', message: 'Cloudinary no está disponible para subir imágenes' }); }
       const result = await uploadBuffer(req.file.buffer, 'packages');
       imageUrl = result.secure_url;
     } else if (typeof image === 'string' && image.trim()) {
@@ -83,15 +120,26 @@ exports.createPackage = async (req, res) => {
 
     const popularFlag = isPopular !== undefined ? toBoolean(isPopular) : (popular !== undefined ? toBoolean(popular) : false);
 
+    const currencyNormalized = (typeof currency === 'string' && (currency.trim().toUpperCase() === 'MXN' || currency.trim().toUpperCase() === 'USD')) ? currency.trim().toUpperCase() : 'USD';
+
     const newPkg = new Package({
       name,
-      description,
-      price: numericPrice,
+      description: description || '',
+      price: numericPrice !== undefined ? numericPrice : undefined,
+      currency: currencyNormalized,
+      priceDouble: numericDouble !== undefined ? numericDouble : undefined,
+      priceDoubleLabel: (typeof priceDoubleLabel === 'string' && priceDoubleLabel.trim()) ? priceDoubleLabel.trim() : 'Base doble',
+      priceChild: numericChild !== undefined ? numericChild : undefined,
+      priceAdult: numericAdult !== undefined ? numericAdult : undefined,
       duration: duration || '',
-      category: (category && ['Populares','Lujo','Económicos'].includes(category)) ? category : 'Populares',
+      startDate: start,
+      endDate: end,
+      category: (category && ['Populares','Lujo','Económicos','Ofertas de fin de semana'].includes(category)) ? category : 'Populares',
+      itinerary: itinerary || '',
       includes: includesArray,
       popular: popularFlag,
-      image: imageUrl
+      image: imageUrl,
+      mainPhotoUrl: imageUrl
     });
 
     const saved = await newPkg.save();
@@ -104,7 +152,7 @@ exports.createPackage = async (req, res) => {
 
 // Actualizar un paquete
 exports.updatePackage = async (req, res) => {
-  const { name, description, price, duration, category, includes, isPopular, popular, image } = req.body;
+  const { name, description, price, currency, priceDouble, priceDoubleLabel, priceChild, priceAdult, duration, startDate, endDate, category, includes, itinerary, isPopular, popular, image, mainPhotoUrl } = req.body;
 
   // Construir objeto de paquete
   const packageFields = {};
@@ -120,7 +168,11 @@ exports.updatePackage = async (req, res) => {
   }
 
   if (duration !== undefined) packageFields.duration = duration;
-  if (category !== undefined) packageFields.category = category;
+  if (category !== undefined) {
+    let cat = category;
+    if (cat === 'Popular') cat = 'Populares';
+    packageFields.category = ['Populares','Lujo','Económicos','Ofertas de fin de semana'].includes(cat) ? cat : 'Populares';
+  }
 
   if (includes !== undefined) {
     let includesArray = [];
@@ -145,15 +197,73 @@ exports.updatePackage = async (req, res) => {
     return Boolean(val);
   };
 
+  const parseDate = (val) => {
+    if (!val) return undefined;
+    try {
+      const d = new Date(val);
+      return Number.isNaN(d.getTime()) ? undefined : d;
+    } catch {
+      return undefined;
+    }
+  };
+
   if (isPopular !== undefined) {
     packageFields.popular = toBoolean(isPopular);
   } else if (popular !== undefined) {
     packageFields.popular = toBoolean(popular);
   }
 
+  if (currency !== undefined) {
+    const c = typeof currency === 'string' ? currency.trim().toUpperCase() : currency;
+    packageFields.currency = (c === 'MXN' || c === 'USD') ? c : 'USD';
+  }
+
+  if (priceDouble !== undefined && priceDouble !== null && priceDouble !== '') {
+    const n = Number(priceDouble);
+    if (Number.isNaN(n)) {
+      return res.status(400).json({ msg: 'El precio base doble debe ser un número' });
+    }
+    packageFields.priceDouble = n;
+  }
+
+  if (priceChild !== undefined && priceChild !== null && priceChild !== '') {
+    const n = Number(priceChild);
+    if (Number.isNaN(n)) {
+      return res.status(400).json({ msg: 'El precio para niños debe ser un número' });
+    }
+    packageFields.priceChild = n;
+  }
+
+  if (priceAdult !== undefined && priceAdult !== null && priceAdult !== '') {
+    const n = Number(priceAdult);
+    if (Number.isNaN(n)) {
+      return res.status(400).json({ msg: 'El precio para adultos debe ser un número' });
+    }
+    packageFields.priceAdult = n;
+  }
+
+  if (priceDoubleLabel !== undefined) {
+    if (typeof priceDoubleLabel === 'string') {
+      const lbl = priceDoubleLabel.trim();
+      packageFields.priceDoubleLabel = lbl || 'Base doble';
+    }
+  }
+
+  if (itinerary !== undefined) packageFields.itinerary = itinerary;
+
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+  if (start !== undefined) packageFields.startDate = start;
+  if (end !== undefined) packageFields.endDate = end;
+
   // La imagen se manejará más adelante (posible subida a Blob en producción)
   if (!req.file && typeof image === 'string' && image.trim()) {
-    packageFields.image = image.trim();
+    const img = image.trim();
+    packageFields.image = img;
+    packageFields.mainPhotoUrl = img;
+  }
+  if (!req.file && typeof mainPhotoUrl === 'string' && mainPhotoUrl.trim()) {
+    packageFields.mainPhotoUrl = mainPhotoUrl.trim();
   }
 
   try {
@@ -166,8 +276,10 @@ exports.updatePackage = async (req, res) => {
     if (!pkg) return res.status(404).json({ msg: 'Paquete no encontrado' });
 
     if (req.file && req.file.buffer) {
+      if (!configured) { return res.status(503).json({ error: 'cloudinary_not_configured', message: 'Cloudinary no está disponible para subir imágenes' }); }
       const result = await uploadBuffer(req.file.buffer, 'packages');
       packageFields.image = result.secure_url;
+      packageFields.mainPhotoUrl = result.secure_url;
       if (pkg.image && isCloudinaryUrl(pkg.image)) {
         try { await deleteByUrl(pkg.image); } catch (e) { console.error('No se pudo borrar imagen anterior de Cloudinary:', e.message); }
       } else if (pkg.image && pkg.image.includes('/uploads/')) {
@@ -205,6 +317,7 @@ exports.deletePackage = async (req, res) => {
     const packageDoc = await Package.findById(id);
     if (!packageDoc) return res.status(404).json({ msg: 'Paquete no encontrado' });
     if (packageDoc.image && isCloudinaryUrl(packageDoc.image)) {
+      if (!configured) { return res.status(503).json({ error: 'cloudinary_not_configured', message: 'Cloudinary no está disponible para eliminar imágenes' }); }
       try { await deleteByUrl(packageDoc.image); } catch (e) { console.error('Error al eliminar imagen de Cloudinary:', e.message); }
     } else if (packageDoc.image && packageDoc.image.includes('/uploads/')) {
       try {

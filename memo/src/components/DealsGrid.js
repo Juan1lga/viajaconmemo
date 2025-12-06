@@ -37,7 +37,7 @@ const DealsGrid = () => {
             .filter(p => p.popular === true || p.category === 'Populares')
             .slice(0, 8)
             .map((pkg) => (
-              <PackageCard key={pkg._id} pkg={pkg} className="package-card" />
+              <PackageCard key={pkg._id} pkg={pkg} className="package-card" hideItinerary showIncludes />
             ))}
         </div>
       )}

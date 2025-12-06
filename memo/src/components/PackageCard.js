@@ -11,7 +11,7 @@ const buildImageSrc = (image) => {
   return image.startsWith("/uploads/") ? `${assetsOrigin}${image}` : image;
 };
 
-const PackageCard = ({ pkg, className, hideItinerary }) => {
+const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
   const [showLb, setShowLb] = useState(false);
   const title = pkg?.name || pkg?.title || "Paquete";
   const rawImage = pkg?.mainPhotoUrl || pkg?.image || pkg?.coverImage || (Array.isArray(pkg?.photos) ? pkg.photos[0]?.url : undefined);
@@ -54,13 +54,16 @@ const PackageCard = ({ pkg, className, hideItinerary }) => {
         <h3 className="pkg-title">{title}</h3>
         {renderDuration()}
         {!shouldHide && pkg?.description && <p className="pkg-desc">{pkg.description}</p>}
-        {!shouldHide && includes.length > 0 && (
+        {(showIncludes || !shouldHide) && includes.length > 0 && (
           <div className="pkg-includes">
             <span className="label">Incluye:</span>
             <div className="pkg-chips">
-              {includes.map((item, idx) => (
+              {includes.slice(0, 3).map((item, idx) => (
                 <span key={idx} className="pkg-chip">{item}</span>
               ))}
+              {includes.length > 3 && (
+                <span className="pkg-chip more">{`+${includes.length - 3}`}</span>
+              )}
             </div>
           </div>
         )}

@@ -13,7 +13,7 @@ backend/uploads/
 .env
 backend/.env
 memo/.env
-memo/.env.production
+
 *.env
 
 # Logs

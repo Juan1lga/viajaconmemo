@@ -109,13 +109,9 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', db: { connected: isConnected, readyState: state } });
 });
 
-// Servir frontend estático en producción
+// En producción no servimos el frontend desde el backend; mantener solo las rutas de API.
 if (isProd) {
-  const buildDir = path.join(__dirname, '../memo/build');
-  app.use(express.static(buildDir));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(buildDir, 'index.html'));
-  });
+  // Sin fallback de SPA aquí. El frontend debe servirse por su plataforma (p.ej., Vercel).
 }
 
 if (!isProd) {
@@ -123,6 +119,10 @@ if (!isProd) {
     res.send('API de Viaja con Memo');
   });
 }
+// Manejador 404 para rutas no existentes del API
+app.use((req, res) => {
+  res.status(404).json({ message: 'Not Found' });
+});
 const PORT = process.env.PORT || 5000;
 
 if (require.main === module) {

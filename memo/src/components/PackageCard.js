@@ -37,7 +37,8 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
       })
     : [{ src: stripCloudinaryTransforms(imgSrc), title }]
 );
-  const shouldHide = Boolean(hideItinerary) || (typeof className === "string" && className.includes("compact"));
+  const isCompact = typeof className === "string" && className.includes("compact");
+  const shouldHide = Boolean(hideItinerary);
   const cur = (typeof pkg?.currency === "string" && pkg.currency.trim().toUpperCase() === "MXN") ? "MXN" : "USD";
   const generalRaw = pkg?.price ?? pkg?.generalPrice;
   const doubleRaw = pkg?.priceDouble ?? pkg?.doublePrice;
@@ -67,25 +68,22 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
 
 
   return (
-    <article className={`package-card travel-card ${className || ""}`}>
-      <div className="pkg-image" onClick={() => setShowLb(s => !s)}>
-        <img src={imgSrc} alt={title} />
-      </div>
-      <div className="pkg-info">
-        {pkg?.category && <div className="pkg-category">{pkg.category}</div>}
-        <h3 className="pkg-title">{title}</h3>
+    <article className={`package-card ${className || ""}`}>
+        <div className="cards__item__pic-wrap pkg-image" onClick={() => setShowLb(true)}>
+          <img className='cards__item__img' src={imgSrc} alt={title} />
+        </div>
+        <div className="cards__item__info pkg-info">
+          {pkg?.category && <div className="pkg-category">{pkg.category}</div>}
+          <h3 className="cards__item__text pkg-title">{title}</h3>
         {renderDuration()}
         {/* Descripción ocultada en la tarjeta; el itinerario se muestra solo en la vista de detalle */}
-        {(showIncludes || !shouldHide) && includes.length > 0 && (
+        {(showIncludes || isCompact) && includes.length > 0 && (
           <div className="pkg-includes">
             <span className="label">Incluye:</span>
             <div className="pkg-chips">
-              {includes.slice(0, 3).map((item, idx) => (
+              {includes.slice(0, 2).map((item, idx) => (
                 <span key={idx} className="pkg-chip">{item}</span>
               ))}
-              {includes.length > 3 && (
-                <span className="pkg-chip more">{`+${includes.length - 3}`}</span>
-              )}
             </div>
           </div>
         )}

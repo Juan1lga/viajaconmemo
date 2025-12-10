@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 
 import PhotoManagement from './PhotoManagement';
+import AlbumManagement from './AlbumManagement';
 
 import './AdminDashboard.css';
 import Logo from './Logo';
@@ -45,6 +46,7 @@ const AdminDashboard = ({ token, setToken }) => {
         <div className="d-flex gap-2">
           <Link to="/admin/workers" className="btn btn-outline-primary">Gestionar equipo</Link>
           <Link to="/admin/users" className="btn btn-outline-primary">Nuevos admin</Link>
+          <Link to="/admin/albums" className="btn btn-outline-primary">Gestionar Álbumes</Link>
           <Link to="/" className="btn btn-outline-secondary">Ver Sitio</Link>
           <button className="btn btn-outline-danger" onClick={handleLogout}>Cerrar Sesión</button>
         </div>
@@ -62,7 +64,7 @@ const AdminDashboard = ({ token, setToken }) => {
       </div>
 
       <div className="row g-4">
-        <div className="col-lg-7">
+        <div className="col-lg-6">
           <div className="card h-100 shadow-sm">
             <div className="card-header d-flex justify-content-between align-items-center">
               <h5 className="mb-0">Gestión de Fotos</h5>
@@ -73,7 +75,18 @@ const AdminDashboard = ({ token, setToken }) => {
             </div>
           </div>
         </div>
-        <div className="col-lg-5">
+        <div className="col-lg-6">
+          <div className="card h-100 shadow-sm">
+            <div className="card-header d-flex justify-content-between align-items-center">
+              <h5 className="mb-0">Gestión de Álbumes</h5>
+              <span className="text-muted small">Admin</span>
+            </div>
+            <div className="card-body">
+              <AlbumManagement />
+            </div>
+          </div>
+        </div>
+        <div className="col-lg-12 mt-4">
           <div className="card h-100 shadow-sm">
             <div className="card-header d-flex justify-content-between align-items-center">
               <h5 className="mb-0">Paquetes</h5>

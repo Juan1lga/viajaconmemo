@@ -47,15 +47,17 @@ exports.getPackageById = async (req, res) => {
 // Crear un paquete
 exports.createPackage = async (req, res) => {
   try {
-    const { name, description, price, currency, priceDouble, priceDoubleLabel, priceChild, priceAdult, duration, startDate, endDate, category, includes, itinerary, isPopular, popular, image, mainPhotoUrl } = req.body;
+    const { name, description, price, currency, priceDouble, priceDoubleLabel, priceChild, priceAdult, duration, startDate, endDate, category, includes, itinerary, priceCustom, priceCustom2, priceCustom3, priceCustom4, isPopular, popular, image, mainPhotoUrl } = req.body;
 
     if (!name) {
       return res.status(400).json({ msg: 'El nombre es requerido' });
     }
 
     const providedPrices = [price, priceDouble, priceChild].filter(v => v !== undefined && v !== null && v !== '');
-    if (providedPrices.length === 0) {
-      return res.status(400).json({ msg: 'Al menos un precio (general, base doble o niños) es requerido' });
+    const hasAnyCustom = [priceCustom, priceCustom2, priceCustom3, priceCustom4].some(v => typeof v === 'string' && v.trim().length > 0);
+    const hasCustomPrice = typeof priceCustom === 'string' && priceCustom.trim().length > 0;
+    if (!hasAnyCustom && providedPrices.length === 0) {
+      return res.status(400).json({ msg: 'El precio es requerido' });
     }
 
     const numericPrice = (price !== undefined && price !== null && price !== '') ? Number(price) : undefined;
@@ -126,6 +128,10 @@ exports.createPackage = async (req, res) => {
       name,
       description: description || '',
       price: numericPrice !== undefined ? numericPrice : undefined,
+      priceCustom: hasCustomPrice ? priceCustom.trim() : '',
+      priceCustom2: (typeof priceCustom2 === 'string' ? priceCustom2.trim() : ''),
+      priceCustom3: (typeof priceCustom3 === 'string' ? priceCustom3.trim() : ''),
+      priceCustom4: (typeof priceCustom4 === 'string' ? priceCustom4.trim() : ''),
       currency: currencyNormalized,
       priceDouble: numericDouble !== undefined ? numericDouble : undefined,
       priceDoubleLabel: (typeof priceDoubleLabel === 'string' && priceDoubleLabel.trim()) ? priceDoubleLabel.trim() : 'Base doble',
@@ -152,7 +158,7 @@ exports.createPackage = async (req, res) => {
 
 // Actualizar un paquete
 exports.updatePackage = async (req, res) => {
-  const { name, description, price, currency, priceDouble, priceDoubleLabel, priceChild, priceAdult, duration, startDate, endDate, category, includes, itinerary, isPopular, popular, image, mainPhotoUrl } = req.body;
+  const { name, description, price, currency, priceDouble, priceDoubleLabel, priceChild, priceAdult, duration, startDate, endDate, category, includes, itinerary, priceCustom, priceCustom2, priceCustom3, priceCustom4, isPopular, popular, image, mainPhotoUrl } = req.body;
 
   // Construir objeto de paquete
   const packageFields = {};
@@ -246,6 +252,38 @@ exports.updatePackage = async (req, res) => {
     if (typeof priceDoubleLabel === 'string') {
       const lbl = priceDoubleLabel.trim();
       packageFields.priceDoubleLabel = lbl || 'Base doble';
+    }
+  }
+
+  if (priceCustom !== undefined) {
+    if (typeof priceCustom === 'string') {
+      packageFields.priceCustom = priceCustom.trim();
+    } else {
+      packageFields.priceCustom = String(priceCustom);
+    }
+  }
+
+  if (priceCustom2 !== undefined) {
+    if (typeof priceCustom2 === 'string') {
+      packageFields.priceCustom2 = priceCustom2.trim();
+    } else {
+      packageFields.priceCustom2 = String(priceCustom2);
+    }
+  }
+
+  if (priceCustom3 !== undefined) {
+    if (typeof priceCustom3 === 'string') {
+      packageFields.priceCustom3 = priceCustom3.trim();
+    } else {
+      packageFields.priceCustom3 = String(priceCustom3);
+    }
+  }
+
+  if (priceCustom4 !== undefined) {
+    if (typeof priceCustom4 === 'string') {
+      packageFields.priceCustom4 = priceCustom4.trim();
+    } else {
+      packageFields.priceCustom4 = String(priceCustom4);
     }
   }
 

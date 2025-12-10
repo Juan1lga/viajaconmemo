@@ -11,6 +11,16 @@ const buildImageSrc = (image) => {
   return image.startsWith("/uploads/") ? `${assetsOrigin}${image}` : image;
 };
 
+// Devuelve la URL original de Cloudinary sin transformaciones para ver la imagen completa
+const stripCloudinaryTransforms = (url) => {
+  if (typeof url !== "string") return url;
+  try {
+    return url.replace(/(\/image\/upload\/)(?!v\d+\/)([^\/]+\/)/, "$1");
+  } catch (e) {
+    return url;
+  }
+};
+
 const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
   const [showLb, setShowLb] = useState(false);
   const title = pkg?.name || pkg?.title || "Paquete";
@@ -18,7 +28,15 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
   const imgSrc = buildImageSrc(rawImage || `${process.env.PUBLIC_URL}/memo-logo.jfif?v=2`);
   const includes = Array.isArray(pkg?.includes) ? pkg.includes : (typeof pkg?.includes === "string" ? pkg.includes.split(",").map(i => i.trim()).filter(Boolean) : []);
   
-  const images = (Array.isArray(pkg?.photos) && pkg.photos.length ? pkg.photos.map(p => ({ src: buildImageSrc(p?.url || p?.src || p), title })) : [{ src: imgSrc, title }]);
+  const images = (
+  Array.isArray(pkg?.photos) && pkg.photos.length
+    ? pkg.photos.map(p => {
+        const srcRaw = buildImageSrc(p?.url || p?.src || p);
+        const src = stripCloudinaryTransforms(srcRaw);
+        return { src, title };
+      })
+    : [{ src: stripCloudinaryTransforms(imgSrc), title }]
+);
   const shouldHide = Boolean(hideItinerary) || (typeof className === "string" && className.includes("compact"));
   const cur = (typeof pkg?.currency === "string" && pkg.currency.trim().toUpperCase() === "MXN") ? "MXN" : "USD";
   const generalRaw = pkg?.price ?? pkg?.generalPrice;
@@ -27,6 +45,10 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
   const adultRaw = pkg?.priceAdult ?? pkg?.adultPrice;
   const isPositive = (v) => v !== undefined && v !== null && v !== "" && !isNaN(Number(v)) && Number(v) > 0;
   const dblLabel = (typeof pkg?.priceDoubleLabel === "string" && pkg.priceDoubleLabel.trim()) ? pkg.priceDoubleLabel.trim() : "Base doble";
+  const customPrice = (typeof pkg?.priceCustom === "string" && pkg.priceCustom.trim()) ? pkg.priceCustom.trim() : null;
+  const customPrice2 = (typeof pkg?.priceCustom2 === "string" && pkg.priceCustom2.trim()) ? pkg.priceCustom2.trim() : null;
+  const customPrice3 = (typeof pkg?.priceCustom3 === "string" && pkg.priceCustom3.trim()) ? pkg.priceCustom3.trim() : null;
+  const customPrice4 = (typeof pkg?.priceCustom4 === "string" && pkg.priceCustom4.trim()) ? pkg.priceCustom4.trim() : null;
   const badges = [
     isPositive(doubleRaw) && { key: "double", label: dblLabel, amount: formatMoney(Number(doubleRaw), cur) },
     isPositive(generalRaw) && { key: "general", label: "General", amount: formatMoney(Number(generalRaw), cur) },
@@ -53,7 +75,7 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
         {pkg?.category && <div className="pkg-category">{pkg.category}</div>}
         <h3 className="pkg-title">{title}</h3>
         {renderDuration()}
-        {!shouldHide && pkg?.description && <p className="pkg-desc">{pkg.description}</p>}
+        {/* Descripción ocultada en la tarjeta; el itinerario se muestra solo en la vista de detalle */}
         {(showIncludes || !shouldHide) && includes.length > 0 && (
           <div className="pkg-includes">
             <span className="label">Incluye:</span>
@@ -68,8 +90,20 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
           </div>
         )}
         <div className="pkg-footer">
-          {badges.length > 0 && (
+          {(customPrice || customPrice2 || customPrice3 || customPrice4 || badges.length > 0) && (
             <div className="pkg-prices">
+              {customPrice && (
+                <div className="price-row price-badge custom">{customPrice}</div>
+              )}
+              {customPrice2 && (
+                <div className="price-row price-badge custom">{customPrice2}</div>
+              )}
+              {customPrice3 && (
+                <div className="price-row price-badge custom">{customPrice3}</div>
+              )}
+              {customPrice4 && (
+                <div className="price-row price-badge custom">{customPrice4}</div>
+              )}
               {badges.map((b) => (
                 <div key={b.key} className={`price-row ${b.key}`}>
                   <span>{b.label}</span>

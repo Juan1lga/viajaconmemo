@@ -4,6 +4,11 @@ const PackageSchema = new mongoose.Schema({
   name: { type: String, required: true },
   // Descripción corta (puede usarse como resumen); el itinerario detallado estará en otro campo
   description: { type: String, default: '' },
+  // Texto de precio libre (permite números y letras)
+  priceCustom: { type: String, default: '' },
+  priceCustom2: { type: String, default: '' },
+  priceCustom3: { type: String, default: '' },
+  priceCustom4: { type: String, default: '' },
   // Precio legacy para compatibilidad; se usará priceDouble si existe
   price: { type: Number, default: 0 },
   // Nueva configuración de precios y moneda

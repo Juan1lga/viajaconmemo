@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
 import { assetsOrigin } from '../utils/api';
-import PhotoUploadForm from "./PhotoUploadForm";
+import { useNavigate } from "react-router-dom";
 import './PhotoAlbum.css';
 import './Gallery.css';
+import Lightbox from './Lightbox';
 
 const PhotoAlbum = () => {
   const [photos, setPhotos] = useState([]);
-  const [showUpload, setShowUpload] = useState(false);
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const items = (photos && photos.length ? photos.map((p) => ({ src: p.url || `${assetsOrigin}${p.imageUrl}`, title: p.title, description: p.description })) : []);
+  const openAt = (idx) => { setSelectedIndex(idx); setIsOpen(true); };
+  const closeLb = () => setIsOpen(false);
 
   const fetchPhotos = async () => {
     try {
@@ -26,28 +32,26 @@ const PhotoAlbum = () => {
 
   return (
     <div className="photo-album">
-      <h2>Álbum de Fotos</h2>
+      <h2>Álbunes</h2>
 
       <div className="gallery-actions">
-        <button className="btn-cta" onClick={() => setShowUpload((v) => !v)}>Sube tu propia foto</button>
+        <button className="btn-cta" onClick={() => navigate('/albums')}>Crea tu álbum</button>
       </div>
 
-      {showUpload && (
-        <div className="upload-panel">
-          <h3 style={{marginTop:0}}>Sube tu propia foto</h3>
-          <PhotoUploadForm onClose={() => { setShowUpload(false); fetchPhotos(); }} />
-        </div>
-      )}
 
-      <div className="photos-container">
-        {photos.map(photo => (
-          <div key={photo._id} className="photo-card">
-            <img src={photo.url || `${assetsOrigin}${photo.imageUrl}`} alt={photo.title} />
-            <h3>{photo.title}</h3>
-            <p>{photo.description}</p>
+      <div className="gallery-grid">
+        {photos.map((photo, idx) => (
+          <div key={photo._id} className="gallery-item" onClick={() => openAt(idx)}>
+            <img src={photo.url || `${assetsOrigin}${photo.imageUrl}`} alt={photo.title || `Foto ${idx+1}`} />
+            <div className="meta">
+              {photo.title && <h4 className="text-outline">{photo.title}</h4>}
+              {photo.description && <p>{photo.description}</p>}
+            </div>
           </div>
         ))}
       </div>
+
+      {isOpen && <Lightbox images={items} startIndex={selectedIndex} onClose={closeLb} />}
     </div>
   );
 };

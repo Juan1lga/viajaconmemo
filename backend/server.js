@@ -96,6 +96,7 @@ app.use('/api', (req, res, next) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/packages', require('./routes/packages'));
 app.use('/api/photos', require('./routes/photos'));
+app.use('/api/albums', require('./routes/albums'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/workers', require('./routes/workers'));
 app.use('/api/payments', require('./routes/payments'));

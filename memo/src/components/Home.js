@@ -1,7 +1,7 @@
 import React from 'react';
 import HeroBanner from './HeroBanner';
 import DealsGrid from './DealsGrid';
-import Gallery from './Gallery';
+
 import './Home.css';
 import Logo from './Logo';
 
@@ -9,6 +9,7 @@ import ServicesGrid from './ServicesGrid';
 import homeContent from '../content/home.json';
 import company from '../content/company.json';
 import { openWhatsApp } from '../utils/whatsapp';
+import { AlbumsPreview } from './AlbumsFeature';
 
 const Home = ({ user }) => {
   const number = company.phone || "";
@@ -30,9 +31,8 @@ const Home = ({ user }) => {
         <section id="packages">
           <DealsGrid />
         </section>
-        <section id="gallery">
-          <Gallery />
-        </section>
+        <AlbumsPreview />
+
       </div>
     </div>
   );

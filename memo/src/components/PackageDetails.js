@@ -6,10 +6,13 @@ import { openWhatsApp, sanitizeNumber } from "../utils/whatsapp";
 import './PackageDetails.css';
 import { formatMoney } from "../utils/formatMoney";
 import { formatDateRange } from "../utils/formatDateRange";
+import ImagePreview from "./ImagePreview";
 
 const PackageDetails = () => {
   const { id } = useParams();
   const [pkg, setPackage] = useState(null);
+  const [isPreviewOpen, setPreviewOpen] = useState(false);
+  const [previewSrc, setPreviewSrc] = useState("");
 
   useEffect(() => {
     const fetchPackage = async () => {
@@ -28,10 +31,14 @@ const PackageDetails = () => {
   const rawImage = pkg.mainPhotoUrl || pkg.image;
   const imageUrl = rawImage && rawImage.startsWith('/uploads/') ? `${assetsOrigin}${rawImage}` : (rawImage || `${process.env.PUBLIC_URL}/memo-logo.jfif?v=2`);
   const cur = pkg.currency === 'MXN' ? 'MXN' : 'USD';
-  const priceGeneral = formatMoney(pkg.price, cur);
-  const priceDouble = formatMoney(pkg.priceDouble, cur);
-  const priceChild = formatMoney(pkg.priceChild, cur);
-  const priceAdult = formatMoney(pkg.priceAdult, cur);
+  const isPositive = (v) => v !== undefined && v !== null && v !== "" && !isNaN(Number(v)) && Number(v) > 0;
+  const dblLabel = (typeof pkg?.priceDoubleLabel === 'string' && pkg.priceDoubleLabel.trim()) ? pkg.priceDoubleLabel.trim() : 'Base doble';
+  const prices = [
+    isPositive(pkg.priceDouble) && { key: 'double', label: dblLabel, amount: formatMoney(pkg.priceDouble, cur) },
+    isPositive(pkg.price) && { key: 'general', label: 'General', amount: formatMoney(pkg.price, cur) },
+    isPositive(pkg.priceChild) && { key: 'child', label: 'Ni\u00f1os', amount: formatMoney(pkg.priceChild, cur) },
+    isPositive(pkg.priceAdult) && { key: 'adult', label: 'Adultos', amount: formatMoney(pkg.priceAdult, cur) },
+  ].filter(Boolean);
   const range = formatDateRange(pkg.startDate, pkg.endDate, { style: 'short' });
 
   const handleWhatsApp = () => {
@@ -49,12 +56,11 @@ const PackageDetails = () => {
     <div className="package-details-container">
       <div className="package-details-card">
         <div className="package-image-section">
-          <img src={imageUrl} alt={pkg.name} className="package-image" />
+          <img src={imageUrl} alt={pkg.name} className="package-image" onClick={() => { setPreviewSrc(imageUrl); setPreviewOpen(true); }} />
         </div>
         <div className="package-info-section">
           <h1 className="package-title">{pkg.name}</h1>
-          {pkg.description && <p className="package-description">{pkg.description}</p>}
-           
+          
           <div className="package-meta">
             <div className="meta-item">
               <span className="meta-title">Duración</span>
@@ -77,12 +83,13 @@ const PackageDetails = () => {
             </div>
           )}
 
-          <div className="package-price-section">
-            <div className="price-row"><span>Base doble</span><span>{priceDouble}</span></div>
-            <div className="price-row"><span>General</span><span>{priceGeneral}</span></div>
-            <div className="price-row"><span>Niños</span><span>{priceChild}</span></div>
-            <div className="price-row"><span>Adultos</span><span>{priceAdult}</span></div>
-          </div>
+          {prices.length > 0 && (
+            <div className="package-price-section">
+              {prices.map(p => (
+                <div key={p.key} className="price-row"><span>{p.label}</span><span>{p.amount}</span></div>
+              ))}
+            </div>
+          )}
 
           {(pkg.itinerary || pkg.description) && (
             <div className="package-itinerary">
@@ -96,6 +103,7 @@ const PackageDetails = () => {
           </button>
         </div>
       </div>
+      {isPreviewOpen && <ImagePreview src={previewSrc} alt={pkg.name} onClose={() => setPreviewOpen(false)} />}
     </div>
   );
 };

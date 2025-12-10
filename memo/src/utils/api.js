@@ -1,7 +1,7 @@
 import axios from "axios";
 const baseURL = process.env.REACT_APP_API_BASE || "http://localhost:5000/api";
 export const assetsOrigin = process.env.REACT_APP_ASSETS_ORIGIN || baseURL.replace(/\/api$/, "");
-const api = axios.create({ baseURL, timeout: 10000 });
+const api = axios.create({ baseURL, timeout: 30000 });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -30,3 +30,32 @@ api.interceptors.response.use(
 );
 
 export default api;
+export const getAlbums = () => api.get('/albums');
+export const createAlbum = (payload) => api.post('/albums', payload);
+export const updateAlbum = (id, payload) => api.put(`/albums/${id}`, payload);
+export const deleteAlbum = (id) => api.delete(`/albums/${id}`);
+export const getAlbumPhotos = (id, params = {}) => api.get(`/albums/${id}/photos`, { params });
+export const uploadPhoto = (formData) => api.post('/photos/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+export const createAlbumWithCover = async (name, file) => {
+  try {
+    const fd = new FormData();
+    fd.append('name', name);
+    if (file) fd.append('cover', file);
+    const { data } = await api.post('/albums', fd);
+    return data;
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
+export const updateAlbumWithCover = async (id, name, file) => {
+  try {
+    const fd = new FormData();
+    if (name !== undefined) fd.append('name', name);
+    if (file) fd.append('cover', file);
+    const { data } = await api.put(`/albums/${id}`, fd);
+    return data;
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};

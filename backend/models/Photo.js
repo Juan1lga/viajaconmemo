@@ -23,6 +23,11 @@ const PhotoSchema = new mongoose.Schema({
     type: String,
     required: function() { return !this.url; }
   },
+  album: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Album',
+    required: false
+  },
   approved: {
     type: Boolean,
     default: false

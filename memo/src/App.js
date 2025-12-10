@@ -19,6 +19,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Footer from './components/Footer';
 import BackgroundCarousel from './components/BackgroundCarousel';
 import BackButton from './components/BackButton';
+import { AlbumsPage, AlbumDetailPage } from './components/AlbumsFeature';
 
 
 
@@ -39,7 +40,7 @@ function App() {
       <Router>
         <div className="App">
         <Navbar />
-        <BackButton hideOnPaths={[]} />
+        <BackButton />
         <BackgroundCarousel />
         
         <main className="main-content">
@@ -49,6 +50,8 @@ function App() {
 
             {/* Nuevas rutas publicas */}
             <Route path="/album" element={<PhotoAlbum />} />
+            <Route path="/albums" element={<AlbumsPage />} />
+            <Route path="/albums/:id" element={<AlbumDetailPage />} />
             <Route path="/company" element={<CompanyInfo />} />
             <Route path="/team" element={<Team />} />
 

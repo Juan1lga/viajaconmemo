@@ -8,7 +8,10 @@ const PackageForm = ({ token }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
-  const [price, setPrice] = useState('');
+  const [priceCustom, setPriceCustom] = useState('');
+  const [priceCustom2, setPriceCustom2] = useState('');
+  const [priceCustom3, setPriceCustom3] = useState('');
+  const [priceCustom4, setPriceCustom4] = useState('');
   // nuevos campos
   const [currency, setCurrency] = useState('USD');
   const [priceDouble, setPriceDouble] = useState('');
@@ -33,7 +36,10 @@ const PackageForm = ({ token }) => {
         const pkg = res.data;
         setName(pkg.name);
         setDescription(pkg.description);
-        setPrice(pkg.price);
+        setPriceCustom(pkg.priceCustom != null ? String(pkg.priceCustom) : '');
+        setPriceCustom2(pkg.priceCustom2 != null ? String(pkg.priceCustom2) : '');
+        setPriceCustom3(pkg.priceCustom3 != null ? String(pkg.priceCustom3) : '');
+        setPriceCustom4(pkg.priceCustom4 != null ? String(pkg.priceCustom4) : '');
         setImage(pkg.image);
         setDuration(pkg.duration || '');
         setCategory((pkg.category === 'Popular' || pkg.category === 'Populares' || pkg.category === 'Lujo' || pkg.category === 'Económicos' || pkg.category === 'Ofertas de fin de semana') ? (pkg.category === 'Popular' ? 'Populares' : pkg.category) : 'Populares');
@@ -57,21 +63,19 @@ const PackageForm = ({ token }) => {
     }
   }, [id]);
 
-  const modality = priceDoubleLabel || 'Base doble';
+  // modalidad eliminada
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
-    formData.append('price', price);
+    formData.append('priceCustom', priceCustom);
+    formData.append('priceCustom2', priceCustom2);
+    formData.append('priceCustom3', priceCustom3);
+    formData.append('priceCustom4', priceCustom4);
     formData.append('currency', currency);
-    formData.append('priceDouble', priceDouble);
-    formData.append('priceChild', priceChild);
-    formData.append('priceAdult', priceAdult);
-    formData.append('priceDoubleLabel', priceDoubleLabel);
-    formData.append('startDate', startDate);
-    formData.append('endDate', endDate);
+
     formData.append('duration', duration);
     formData.append('category', category);
     formData.append('includes', includesInput);
@@ -85,7 +89,7 @@ const PackageForm = ({ token }) => {
         formData.append('image', image);
       }
       try {
-        await api.put(`/packages/${id}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+        await api.put(`/packages/${id}`, formData);
         showSuccess('Paquete actualizado con éxito');
         navigate('/admin');
       } catch (err) {
@@ -104,7 +108,7 @@ const PackageForm = ({ token }) => {
         formData.append('image', image);
       }
       try {
-        await api.post('/packages', formData, { headers: { "Content-Type": "multipart/form-data" } });
+        await api.post('/packages', formData);
         showSuccess('Paquete creado con éxito');
         navigate('/admin');
       } catch (err) {
@@ -132,32 +136,24 @@ const PackageForm = ({ token }) => {
             </select>
           </div>
           <div className="col-md-6">
-            <label className="form-label">Precio general</label>
-            <input type='number' className='form-control' placeholder='Precio' value={price} onChange={(e) => setPrice(e.target.value)} step='0.01' min='0' />
+            <label className="form-label">Precio</label>
+            <input type='text' className='form-control' placeholder='Ej: 1200 USD por persona' value={priceCustom} onChange={(e) => setPriceCustom(e.target.value)} />
           </div>
           <div className="col-md-6">
-            <label className="form-label">{`Precio ${modality}`}</label>
-            <input type='number' className='form-control' placeholder={`Precio ${modality}`} value={priceDouble} onChange={(e) => setPriceDouble(e.target.value)} step='0.01' min='0' />
+            <label className="form-label">Precio 2</label>
+            <input type='text' className='form-control' placeholder='Otro precio (texto libre)' value={priceCustom2} onChange={(e) => setPriceCustom2(e.target.value)} />
           </div>
           <div className="col-md-6">
-            <label className="form-label">Precio para niños</label>
-            <input type='number' className='form-control' placeholder='Precio niños' value={priceChild} onChange={(e) => setPriceChild(e.target.value)} step='0.01' min='0' />
-          </div>
-           <div className="col-md-6">
-            <label className="form-label">Modalidad de pago</label>
-            <select className='form-select' value={priceDoubleLabel} onChange={(e) => setPriceDoubleLabel(e.target.value)}>
-              <option value='Base sencilla'>Base sencilla</option>
-              <option value='Base doble'>Base doble</option>
-              <option value='Base triple'>Base triple</option>
-            </select>
+            <label className="form-label">Precio 3</label>
+            <input type='text' className='form-control' placeholder='Otro precio (texto libre)' value={priceCustom3} onChange={(e) => setPriceCustom3(e.target.value)} />
           </div>
           <div className="col-md-6">
-            <label className="form-label">Precio para adultos</label>
-            <input type='number' className='form-control' placeholder='Precio adultos' value={priceAdult} onChange={(e) => setPriceAdult(e.target.value)} step='0.01' min='0' />
+            <label className="form-label">Precio 4</label>
+            <input type='text' className='form-control' placeholder='Otro precio (texto libre)' value={priceCustom4} onChange={(e) => setPriceCustom4(e.target.value)} />
           </div>
           <div className="col-md-6">
-            <label className="form-label">Duración</label>
-            <input type='text' className='form-control' placeholder='Ej: 7 días' value={duration} onChange={(e) => setDuration(e.target.value)} />
+            <label className="form-label">Fecha</label>
+            <input type='text' className='form-control' placeholder='Ej: Enero 2025 o fechas a consultar' value={duration} onChange={(e) => setDuration(e.target.value)} />
           </div>
           <div className="col-md-6">
             <label className="form-label">Categoría</label>
@@ -172,14 +168,8 @@ const PackageForm = ({ token }) => {
             <label className="form-label">Itinerario</label>
             <textarea className='form-control' placeholder='Describe el itinerario detallado' value={description} onChange={(e) => setDescription(e.target.value)} required rows={4}></textarea>
           </div>
-          <div className="col-md-6">
-            <label className="form-label">Fecha inicio</label>
-            <input type='date' className='form-control' value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">Fecha fin</label>
-            <input type='date' className='form-control' value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-          </div>
+
+
           <div className="col-md-6">
             <label className="form-label">URL de la Imagen</label>
             <input type='text' className='form-control' placeholder='http://...' value={image} onChange={(e) => setImage(e.target.value)} />

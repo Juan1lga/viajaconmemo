@@ -1,4 +1,5 @@
 const Photo = require('../models/Photo');
+const Album = require('../models/Album');
 const mongoose = require('mongoose');
 
 const path = require('path');
@@ -25,10 +26,16 @@ exports.uploadPhoto = async (req, res) => {
     const { title, description, image } = req.body;
     let url = null;
     let public_id = null;
+    let albumId = req.body && req.body.album ? String(req.body.album) : null;
+    let albumDoc = null;
+    if (albumId && mongoose.Types.ObjectId.isValid(albumId)) {
+      try { albumDoc = await Album.findById(albumId); } catch (_) {}
+    }
 
     if (req.file && req.file.buffer) {
       if (!configured) { return res.status(503).json({ error: 'cloudinary_not_configured', message: 'Cloudinary no está disponible para subir imágenes' }); }
-      const result = await uploadBuffer(req.file.buffer, 'photos');
+      const folderName = albumDoc && albumDoc.slug ? `albums/${albumDoc.slug}` : 'photos';
+      const result = await uploadBuffer(req.file.buffer, folderName);
       url = result.secure_url;
       public_id = result.public_id || null;
     } else if (typeof image === 'string' && image.trim()) {
@@ -37,9 +44,11 @@ exports.uploadPhoto = async (req, res) => {
       return res.status(400).json({ ok: false, "error": "file_required", "message": "Adjunta una imagen en el campo \"image\" o envía una URL válida en body.image" });
     }
 
-    const photo = new Photo({ title, description, url });
+    const photoData = { title, description, url };
+    if (albumDoc && albumDoc._id) { photoData.album = albumDoc._id; } else if (albumId && mongoose.Types.ObjectId.isValid(albumId)) { photoData.album = albumId; }
+    const photo = new Photo(photoData);
     await photo.save();
-    res.status(201).json({ ok: true, url, public_id });
+    res.status(201).json({ ok: true, url, public_id, photo });
   } catch (err) {
     console.error('Error al subir foto:', err.message);
     res.status(500).json({ "error": "upload_failed", "detail": err.message });
@@ -99,11 +108,20 @@ exports.updatePhoto = async (req, res) => {
     if (req.body.title !== undefined) updateFields.title = req.body.title;
     if (req.body.description !== undefined) updateFields.description = req.body.description;
     if (req.body.approved !== undefined) updateFields.approved = toBoolean(req.body.approved);
+    if (req.body.album !== undefined) {
+      updateFields.album = mongoose.Types.ObjectId.isValid(req.body.album) ? req.body.album : null;
+    }
 
     if (req.file && req.file.buffer) {
       if (!configured) { return res.status(503).json({ error: 'cloudinary_not_configured', message: 'Cloudinary no está disponible para subir imágenes' }); }
+      let albumId = req.body && req.body.album ? String(req.body.album) : (photo && photo.album ? String(photo.album) : null);
+      let albumDoc = null;
+      if (albumId && mongoose.Types.ObjectId.isValid(albumId)) {
+        try { albumDoc = await Album.findById(albumId); } catch (_) {}
+      }
+      const folderName = albumDoc && albumDoc.slug ? `albums/${albumDoc.slug}` : 'photos';
       // Subir nueva imagen a Cloudinary
-      const result = await uploadBuffer(req.file.buffer, 'photos');
+      const result = await uploadBuffer(req.file.buffer, folderName);
       updateFields.url = result.secure_url;
       // Borrar imagen anterior si existía
       if (photo && isCloudinaryUrl(photo.url)) {

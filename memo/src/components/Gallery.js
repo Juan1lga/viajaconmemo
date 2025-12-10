@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { assetsOrigin } from "../utils/api";
 import Lightbox from "./Lightbox";
-import PhotoUploadForm from "./PhotoUploadForm";
 import "./Gallery.css";
 import AboutMemo from "./AboutMemo";
+import { useNavigate } from "react-router-dom";
 
 const Gallery = () => {
   const [photos, setPhotos] = useState([]);
@@ -12,7 +12,7 @@ const Gallery = () => {
   const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [showUpload, setShowUpload] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchApprovedPhotos = async () => {
@@ -47,7 +47,7 @@ const Gallery = () => {
       <h2 className="gallery-title section-title--white">Galeria de Aventuras</h2>
 
       <div className="gallery-actions">
-        <button className="btn-cta" onClick={() => setShowUpload((v) => !v)}>Sube tu propia foto</button>
+        <button className="btn-cta" onClick={() => navigate('/albums')}>Crear tu álbum</button>
       </div>
 
       {items.length === 0 ? (
@@ -68,12 +68,6 @@ const Gallery = () => {
 
       {isOpen && <Lightbox images={items} startIndex={selectedIndex} onClose={closeLb} />}
 
-      {showUpload && (
-        <div className="upload-panel" style={{marginTop:"12px",padding:"12px",border:"1px solid #eee",borderRadius:"8px",boxShadow:"0 4px 12px rgba(0,0,0,.08)",background:"#fff"}}>
-          <h3 style={{marginTop:0}}>Sube tu propia foto</h3>
-          <PhotoUploadForm onClose={() => setShowUpload(false)} />
-        </div>
-      )}
     </section>
     <AboutMemo />
     </>

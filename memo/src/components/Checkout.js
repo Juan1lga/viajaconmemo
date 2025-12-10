@@ -62,7 +62,7 @@ const imgSrc = buildImageSrc(pkg.image);
     <div className="checkout" style={{ maxWidth: 900, margin: "0 auto", padding: 16 }}>
       <h2>Checkout</h2>
       <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 16 }}>
-        <img src={imgSrc} alt={pkg.name} style={{ width: "100%", borderRadius: 8, objectFit: "cover" }} />
+        <img src={imgSrc} alt={pkg.name} style={{ width: "100%", borderRadius: 8, objectFit: "contain", maxHeight: "80vh", background: "#000" }} />
         <div>
           <h3 style={{ marginTop: 0 }}>{pkg.name}</h3>
           <p>{pkg.description}</p>

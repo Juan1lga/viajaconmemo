@@ -129,12 +129,12 @@ if (!isProd) {
 app.use((req, res) => {
   res.status(404).json({ message: 'Not Found' });
 });
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 3001;
 
 if (require.main === module) {
   (async () => {
     await connectPromise;
-    app.listen(PORT, '0.0.0.0', () => console.log(`Servidor corriendo en puerto ${PORT}`));
+    app.listen(port, '0.0.0.0', () => console.log(`Servidor corriendo en puerto ${port}`));
   })();
 }
 

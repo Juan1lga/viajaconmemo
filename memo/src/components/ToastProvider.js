@@ -9,28 +9,28 @@ export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
   const timersRef = useRef(new Map());
 
-  const removeToast = (id) => {
+  const removeToast = React.useCallback((id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
     const timer = timersRef.current.get(id);
     if (timer) {
       clearTimeout(timer);
       timersRef.current.delete(id);
     }
-  };
+  }, []);
 
-  const pushToast = (type, message, options = {}) => {
+  const pushToast = React.useCallback((type, message, options = {}) => {
     const id = genId();
     const ttl = options.ttl ?? 4000; // ms
     const newToast = { id, type, message };
     setToasts((prev) => [newToast, ...prev]);
     const timer = setTimeout(() => removeToast(id), ttl);
     timersRef.current.set(id, timer);
-  };
+  }, [removeToast]);
 
-  const showSuccess = (message, options) => pushToast("success", message, options);
-  const showError = (message, options) => pushToast("error", message, options);
+  const showSuccess = React.useCallback((message, options) => pushToast("success", message, options), [pushToast]);
+  const showError = React.useCallback((message, options) => pushToast("error", message, options), [pushToast]);
 
-  const value = useMemo(() => ({ showSuccess, showError }), []);
+  const value = useMemo(() => ({ showSuccess, showError }), [showSuccess, showError]);
 
   // Exponer manejadores globales para uso desde utilidades (axios interceptors)
   useEffect(() => {
@@ -39,12 +39,13 @@ export const ToastProvider = ({ children }) => {
       success: (msg, opts) => showSuccess(msg, opts),
       error: (msg, opts) => showError(msg, opts),
     };
+    const timersMap = timersRef.current;
     return () => {
       if (g.__toast) delete g.__toast;
-      timersRef.current.forEach((timer) => clearTimeout(timer));
-      timersRef.current.clear();
+      timersMap.forEach((timer) => clearTimeout(timer));
+      timersMap.clear();
     };
-  }, []);
+  }, [showSuccess, showError]);
 
   return (
     <ToastContext.Provider value={value}>

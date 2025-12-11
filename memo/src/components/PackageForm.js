@@ -16,10 +16,7 @@ const PackageForm = ({ token }) => {
   const [currency, setCurrency] = useState('USD');
   const [priceDouble, setPriceDouble] = useState('');
   const [priceChild, setPriceChild] = useState('');
-  const [priceAdult, setPriceAdult] = useState('');
-  const [priceDoubleLabel, setPriceDoubleLabel] = useState('Base doble');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+
   const [duration, setDuration] = useState('');
   const [category, setCategory] = useState('Populares');
   const [includesInput, setIncludesInput] = useState('');
@@ -48,15 +45,9 @@ const PackageForm = ({ token }) => {
         setCurrency((pkg.currency === 'MXN' || pkg.currency === 'USD') ? pkg.currency : 'USD');
         setPriceDouble(pkg.priceDouble != null ? String(pkg.priceDouble) : '');
         setPriceChild(pkg.priceChild != null ? String(pkg.priceChild) : '');
-        setPriceAdult(pkg.priceAdult != null ? String(pkg.priceAdult) : '');
-        setPriceDoubleLabel((typeof pkg.priceDoubleLabel === 'string' && pkg.priceDoubleLabel.trim()) ? pkg.priceDoubleLabel : 'Base doble');
-        try {
-          const sd = pkg.startDate ? new Date(pkg.startDate) : null;
-          const ed = pkg.endDate ? new Date(pkg.endDate) : null;
-          const toInput = (d) => d ? new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10) : '';
-          setStartDate(sd ? toInput(sd) : '');
-          setEndDate(ed ? toInput(ed) : '');
-        } catch (_) {}
+
+
+
 
       };
       fetchPackage();

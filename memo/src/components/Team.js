@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../utils/api';
-import { assetsOrigin } from '../utils/api';
+
 import './Team.css';
 
 const Team = () => {

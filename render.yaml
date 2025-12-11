@@ -1,10 +1,10 @@
 services:
 - type: web
   name: viajaconmemo-backend
-  env: node
+  runtime: node
   rootDir: backend
-  branch: main
-  autoDeploy: true
   buildCommand: npm ci
   startCommand: node server.js
   healthCheckPath: /health
+  branch: main
+  autoDeploy: true

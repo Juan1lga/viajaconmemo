@@ -15,7 +15,7 @@ const buildImageSrc = (image) => {
 const stripCloudinaryTransforms = (url) => {
   if (typeof url !== "string") return url;
   try {
-    return url.replace(/(\/image\/upload\/)(?!v\d+\/)([^\/]+\/)/, "$1");
+    return url.replace(/(\/image\/upload\/)(?!v\d+\/)([^/]+\/)/, "$1");
   } catch (e) {
     return url;
   }
@@ -38,7 +38,7 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
     : [{ src: stripCloudinaryTransforms(imgSrc), title }]
 );
   const isCompact = typeof className === "string" && className.includes("compact");
-  const shouldHide = Boolean(hideItinerary);
+
   const cur = (typeof pkg?.currency === "string" && pkg.currency.trim().toUpperCase() === "MXN") ? "MXN" : "USD";
   const generalRaw = pkg?.price ?? pkg?.generalPrice;
   const doubleRaw = pkg?.priceDouble ?? pkg?.doublePrice;

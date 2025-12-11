@@ -66,6 +66,8 @@ const PackageForm = ({ token }) => {
     formData.append('priceCustom3', priceCustom3);
     formData.append('priceCustom4', priceCustom4);
     formData.append('currency', currency);
+    formData.append('priceDouble', priceDouble);
+    formData.append('priceChild', priceChild);
 
     formData.append('duration', duration);
     formData.append('category', category);

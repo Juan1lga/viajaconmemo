@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./Lightbox.css";
 
 const Lightbox = ({ images = [], startIndex = 0, onClose }) => {
@@ -8,6 +8,9 @@ const Lightbox = ({ images = [], startIndex = 0, onClose }) => {
     setIndex(startIndex);
   }, [startIndex]);
 
+  const handlePrev = useCallback(() => setIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1)), [images.length]);
+  const handleNext = useCallback(() => setIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1)), [images.length]);
+
   useEffect(() => {
     const onKeyDown = (e) => {
       if (e.key === "Escape") onClose && onClose();
@@ -16,10 +19,7 @@ const Lightbox = ({ images = [], startIndex = 0, onClose }) => {
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [index]);
-
-  const handlePrev = () => setIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  const handleNext = () => setIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  }, [handleNext, handlePrev, onClose]);
 
   if (!images.length) return null;
   const current = images[index] || {};

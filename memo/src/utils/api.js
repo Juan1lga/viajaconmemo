@@ -15,9 +15,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-    const msg = error?.response?.data?.msg || (error.code === 'ERR_NETWORK' ? 'No se pudo conectar con el servidor. Verifica tu conexión y que la API esté activa.' : error.message) || 'Error inesperado';
+    const isNetworkErr = error && error.code === 'ERR_NETWORK';
+    const msg = error?.response?.data?.msg || (isNetworkErr ? 'No se pudo conectar con el servidor. Verifica tu conexión y que la API esté activa.' : error.message) || 'Error inesperado';
     try {
-      if (typeof window !== "undefined" && window.__toast && typeof window.__toast.error === "function") {
+      if (!isNetworkErr && typeof window !== "undefined" && window.__toast && typeof window.__toast.error === "function") {
         window.__toast.error(msg);
       }
     } catch (_) {}
@@ -29,11 +30,43 @@ api.interceptors.response.use(
   }
 );
 
-export default api;
-export const getAlbums = () => api.get('/albums');
+
+const CACHE_TTL_MS = 3600000;
+const readCache = (key) => { try { const raw = localStorage.getItem(key); if (!raw) return null; const obj = JSON.parse(raw); if (!obj || typeof obj !== 'object') return null; return obj; } catch (_) { return null; } };
+const writeCache = (key, value) => { try { const payload = { ts: Date.now(), data: value }; localStorage.setItem(key, JSON.stringify(payload)); } catch (_) {} };
+const cachedGet = async (path, options = {}, cacheKey) => {
+  const getOpts = { ...options, timeout: Math.min((options && options.timeout) || 5000, 5000) };
+  const cachedObj = cacheKey ? readCache(cacheKey) : null;
+  const expired = cachedObj ? (Date.now() - (cachedObj.ts || 0) > CACHE_TTL_MS) : false;
+  if (cachedObj) {
+    // Mostrar datos de caché inmediatamente y revalidar en segundo plano
+    api.get(path, getOpts).then((res) => {
+      if (cacheKey) writeCache(cacheKey, res.data);
+    }).catch(() => {});
+    return { data: cachedObj.data, stale: expired };
+  }
+  const attempt = async () => {
+    const res = await api.get(path, getOpts);
+    if (cacheKey) writeCache(cacheKey, res.data);
+    return res;
+  };
+  try {
+    return await attempt();
+  } catch (err) {
+    // Reintento rápido con backoff corto
+    await new Promise((r) => setTimeout(r, 1200));
+    try {
+      return await attempt();
+    } catch (err2) {
+      return Promise.reject(err2);
+    }
+  }
+};
+export const getAlbums = () => cachedGet('/albums', undefined, 'cache:albums');
 export const createAlbum = (payload) => api.post('/albums', payload);
 export const updateAlbum = (id, payload) => api.put(`/albums/${id}`, payload);
 export const deleteAlbum = (id) => api.delete(`/albums/${id}`);
+export const getPackages = () => cachedGet('/packages', undefined, 'cache:packages');
 export const getAlbumPhotos = (id, params = {}) => api.get(`/albums/${id}/photos`, { params });
 export const uploadPhoto = (formData) => api.post('/photos/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const createAlbumWithCover = async (name, file) => {
@@ -59,3 +92,5 @@ export const updateAlbumWithCover = async (id, name, file) => {
     return Promise.reject(err);
   }
 };
+
+export default api;

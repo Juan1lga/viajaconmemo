@@ -42,7 +42,7 @@ const Navbar = () => {
               <Link to="/" className="nav-link" onClick={closeNav}>Inicio</Link>
             </li>
             <li className="nav-item">
-              <Link to="/albums" className="nav-link" onClick={closeNav}>Álbunes</Link>
+              <Link to="/albums" className="nav-link" onClick={closeNav}>Álbumes</Link>
             </li>
             <li className="nav-item">
               <Link to="/company" className="nav-link" onClick={closeNav}>Nuestra Empresa</Link>

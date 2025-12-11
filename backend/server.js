@@ -88,6 +88,7 @@ const connectPromise = connectDB();
 
 // Rutas
 app.use('/api', (req, res, next) => {
+  if (req.path === '/health') return next();
   if (!isConnected) {
     return res.status(503).json({ error: 'Servicio temporalmente no disponible', detail: 'Sin conexión a la base de datos', retryAfterMs: 5000 });
   }
@@ -106,6 +107,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Health route
 app.get('/health', (req, res) => {
+  const state = mongoose.connection.readyState;
+  res.json({ status: 'ok', db: { connected: isConnected, readyState: state } });
+});
+app.get('/api/health', (req, res) => {
   const state = mongoose.connection.readyState;
   res.json({ status: 'ok', db: { connected: isConnected, readyState: state } });
 });

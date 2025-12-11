@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../utils/api";
+import { getPackages, assetsOrigin } from "../utils/api";
 import PackageCard from "./PackageCard";
 import "./Deals.css";
 
@@ -12,14 +12,17 @@ const DealsGrid = () => {
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const { data } = await api.get("/packages");
-        setPackages(data || []);
+        const { data } = await getPackages();
+        setPackages(Array.isArray(data) ? data : []);
       } catch (e) {
         setError("No se pudieron cargar las ofertas.");
       } finally {
         setLoading(false);
       }
     };
+    try {
+      fetch(`${assetsOrigin}/health`, { cache: "no-store" }).catch(() => {});
+    } catch (_) {}
     fetchPackages();
   }, []);
 

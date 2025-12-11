@@ -32,7 +32,7 @@ const PhotoAlbum = () => {
 
   return (
     <div className="photo-album">
-      <h2>Álbunes</h2>
+      <h2>Álbumes</h2>
 
       <div className="gallery-actions">
         <button className="btn-cta" onClick={() => navigate('/albums')}>Crea tu álbum</button>

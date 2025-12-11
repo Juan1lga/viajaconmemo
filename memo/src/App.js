@@ -20,12 +20,15 @@ import Footer from './components/Footer';
 import BackgroundCarousel from './components/BackgroundCarousel';
 import BackButton from './components/BackButton';
 import { AlbumsPage, AlbumDetailPage } from './components/AlbumsFeature';
-
+import api from './utils/api';
 
 
 // Componente principal de la aplicación
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
+
+  // Ping de salud para despertar el backend y evitar esperas largas en la primera carga
+  useEffect(() => { api.get('/health', { timeout: 4000 }).catch(() => {}); }, []);
 
   useEffect(() => {
     if (token) {

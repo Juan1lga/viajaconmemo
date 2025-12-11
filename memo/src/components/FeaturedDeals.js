@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../utils/api';
+import { getPackages } from '../utils/api';
 import './Cards.css';
 import './FeaturedDeals.css';
 import PackageCard from './PackageCard';
@@ -12,8 +12,9 @@ const FeaturedDeals = () => {
   useEffect(() => {
     const fetchDeals = async () => {
       try {
-        const { data } = await api.get('/packages');
-        const popularDeals = (data || []).filter(p => p.popular === true || p.category === 'Populares').slice(0, 6);
+        const { data } = await getPackages();
+        const list = Array.isArray(data) ? data : [];
+        const popularDeals = list.filter(p => p.popular === true || p.category === 'Populares').slice(0, 6);
         setDeals(popularDeals);
       } catch (error) {
         console.error('Error al cargar paquetes populares:', error?.message || error);

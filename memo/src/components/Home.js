@@ -4,6 +4,7 @@ import DealsGrid from './DealsGrid';
 
 import './Home.css';
 import Logo from './Logo';
+import AboutMemo from './AboutMemo';
 
 import ServicesGrid from './ServicesGrid';
 import homeContent from '../content/home.json';
@@ -21,6 +22,7 @@ const Home = ({ user }) => {
       <div className="container">
 
         <ServicesGrid />
+        <AboutMemo />
         <div className="cta-block" style={{textAlign:'center',padding:'1.5rem 1rem'}}>
           <h2 className="cta-title">{homeContent.cta?.title}</h2>
           <p className="text-outline" style={{color:'#fff'}}>{homeContent.cta?.text}</p>

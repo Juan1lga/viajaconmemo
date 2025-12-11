@@ -5,6 +5,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { assetsOrigin } from './utils/api';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,3 +15,7 @@ root.render(
 );
 
 reportWebVitals();
+
+try {
+  fetch(`${assetsOrigin}/health`, { cache: 'no-store' }).catch(() => {});
+} catch (_) {}

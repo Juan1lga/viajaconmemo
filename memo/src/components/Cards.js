@@ -27,14 +27,14 @@ function Cards() {
           <ul className='cards__items'>
             {packages.slice(0, 2).map((pkg) => (
               <li className='cards__item' key={pkg._id}>
-                <PackageCard pkg={pkg} />
+                <PackageCard pkg={pkg} variant="booking small" />
               </li>
             ))}
           </ul>
           <ul className='cards__items'>
             {packages.slice(2, 5).map((pkg) => (
               <li className='cards__item' key={pkg._id}>
-                <PackageCard pkg={pkg} />
+                <PackageCard pkg={pkg} variant="booking small" />
               </li>
             ))}
           </ul>

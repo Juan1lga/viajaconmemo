@@ -6,7 +6,7 @@ import CompraPaquetes from './components/CompraPaquetes';
 import PackageDetails from './components/PackageDetails';
 import Navbar from './components/Navbar';
 import PhotoAlbum from './components/PhotoAlbum';
-import CompanyInfo from './components/CompanyInfo';
+import CompanyPage from './components/CompanyPage';
 import Team from './components/Team';
 import Home from './components/Home';
 import PackageForm from './components/PackageForm';
@@ -20,15 +20,15 @@ import Footer from './components/Footer';
 import BackgroundCarousel from './components/BackgroundCarousel';
 import BackButton from './components/BackButton';
 import { AlbumsPage, AlbumDetailPage } from './components/AlbumsFeature';
-import api from './utils/api';
+import api, { getPackages, getAlbums } from './utils/api';
+import LoadingSplash from './components/LoadingSplash';
 
 
 // Componente principal de la aplicación
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
+  const [isBooting, setIsBooting] = useState(true);
 
-  // Ping de salud para despertar el backend y evitar esperas largas en la primera carga
-  useEffect(() => { api.get('/health', { timeout: 4000 }).catch(() => {}); }, []);
 
   useEffect(() => {
     if (token) {
@@ -38,10 +38,34 @@ function App() {
     }
   }, [token]);
 
+  // Esperar a que el backend confirme salud y conexión a la base de datos antes de ocultar el splash
+  useEffect(() => {
+    let alive = true;
+    const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+    const probe = async () => {
+      while (alive) {
+        try {
+          const { data } = await api.get('/health', { timeout: 4000 });
+          const ok = data && data.status === 'ok';
+          const connected = !!(data && data.db && data.db.connected === true);
+          if (ok && connected) {
+            setIsBooting(false);
+            try { getPackages(); getAlbums(); } catch (_) {}
+            return;
+          }
+        } catch (_) {}
+        await delay(1500);
+      }
+    };
+    probe();
+    return () => { alive = false; };
+  }, []);
+
   return (
     <ToastProvider>
       <Router>
         <div className="App">
+{isBooting && <LoadingSplash />}
         <Navbar />
         <BackButton />
         <BackgroundCarousel />
@@ -55,7 +79,7 @@ function App() {
             <Route path="/album" element={<PhotoAlbum />} />
             <Route path="/albums" element={<AlbumsPage />} />
             <Route path="/albums/:id" element={<AlbumDetailPage />} />
-            <Route path="/company" element={<CompanyInfo />} />
+            <Route path="/company" element={<CompanyPage />} />
             <Route path="/team" element={<Team />} />
 
             {/* Ruta pública para la compra de paquetes */}

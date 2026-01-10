@@ -27,6 +27,7 @@ h1 {
   gap: 24px; /* Adjusted to a smaller value */
   margin-bottom: 2rem;
   justify-content: center;
+  align-items: stretch;
 }
 
 @media (min-width: 769px) {
@@ -40,6 +41,7 @@ h1 {
   border-radius: 10px;
   max-width: unset;
   width: auto;
+  height: 100%;
   margin-bottom: 0; /* Adjusted to a smaller value */
   margin-left: 0; /* Adjusted to remove excessive left margin */
   margin-right: 0; /* Adjusted to remove excessive right margin */
@@ -48,6 +50,7 @@ h1 {
 .cards__item__link {
   display: flex;
   flex-flow: column;
+  height: 100%;
   width: 100%;
   box-shadow: 0 6px 20px rgba(56, 125, 255, 0.17);
   -webkit-filter: drop-shadow(0 6px 20px rgba(56, 125, 255, 0.017));
@@ -109,6 +112,7 @@ h1 {
   position: relative;
   z-index: 2;
   background: #fff;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -125,6 +129,16 @@ h1 {
   color: #fff;
   font-weight: 700;
 }
+
+.cards__item__footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Compatibilidad con PackageCard */
+.pkg-footer { margin-top: auto; }
 
 .packages-header {
   text-align: center;
@@ -201,8 +215,12 @@ h1 {
 .cards__items .package-card:nth-child(3){animation-delay:180ms}
 .cards__items .package-card:nth-child(4){animation-delay:240ms}
 .cards__items .package-card:nth-child(5){animation-delay:300ms}
-.packages-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
+.packages-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px}
 .packages-grid .cards__item{margin-bottom:0;max-width:unset;width:auto}
+/* Uniformar tamaño en grid de Home */
+.cards__item{width:100%}
+.cards__items .package-card{width:100%}
+.cards__items .package-card.small{max-width:unset}
 @media only screen and (max-width:768px){.packages-grid{grid-template-columns:1fr}}
 @media only screen and (max-width:480px){
   .packages-header h1{font-size:32px}

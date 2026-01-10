@@ -32,7 +32,7 @@ const FeaturedDeals = () => {
           <ul className='cards__items'>
             {deals.map(deal => (
               <li className='cards__item package-wide' key={deal._id}>
-                <PackageCard pkg={deal} className='travel-card package-card-horizontal' hideItinerary />
+                <PackageCard pkg={deal} plain />
               </li>
             ))}
           </ul>

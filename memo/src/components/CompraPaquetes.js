@@ -3,7 +3,13 @@ import { getPackages } from '../utils/api';
 import './Cards.css';
 import PackageCard from './PackageCard';
 
+
 const Packages = () => {
+
+  
+
+
+
   const [packages, setPackages] = useState([]);
   const [activeFilter, setActiveFilter] = useState('Todos');
   const [loading, setLoading] = useState(false);
@@ -61,12 +67,13 @@ const Packages = () => {
           <ul className='cards__items packages-grid'>
             {filteredPackages.map(pkg => (
               <li className='cards__item' key={pkg._id}>
-                <PackageCard pkg={pkg} className='compact' />
+                <PackageCard pkg={pkg} plain showIncludes />
               </li>
             ))}
           </ul>
         </div>
       </div>
+
     </div>
   );
 };

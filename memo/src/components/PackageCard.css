@@ -1,22 +1,47 @@
 /* Contenedor principal de la tarjeta */
-.package-card{
-  background:#fff;
+.package-card {
+  background: #fff;
   margin-bottom: 10px;
-  display:flex;
-  flex-direction:column;
-  /* padding:10px; */
-  height:auto;
-  /* min-height:380px; */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   gap: 10px;
   border-radius: 10px;
   box-shadow: 0 6px 20px rgba(56, 125, 255, 0.17);
   -webkit-filter: drop-shadow(0 6px 20px rgba(56, 125, 255, 0.017));
   filter: drop-shadow(0 6px 20px rgba(56, 125, 255, 0.017));
-  overflow: visible;
+  overflow: hidden;
   text-decoration: none;
-  transition:transform 220ms ease,box-shadow 220ms ease;
-  will-change:transform,box-shadow;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+  will-change: transform, box-shadow;
 }
+
+/* Variante vertical */
+.package-card.vertical {
+  flex-direction: column;
+}
+
+/* Variante booking: layout vertical con imagen arriba y precios en columnas */
+.package-card.booking { flex-direction: column; }
+.package-card.booking .pkg-image { width: 100%; height: 180px; padding-top: 0; }
+.package-card.booking.small .pkg-image { height: 160px; }
+.package-card.booking .pkg-info { padding: 12px 14px; }
+.package-card.booking .pkg-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+.package-card.booking .pkg-prices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+@media(max-width:768px){ .package-card.booking .pkg-prices { grid-template-columns: 1fr; } }
+.package-card.booking .btn-cta { align-self: flex-start; }
+
+.package-card.vertical .pkg-image {
+  width: 100%;
+  height: auto;
+  padding-top: 67%; /* Mantiene el aspect ratio */
+  flex: 0 0 auto;
+}
+
+.package-card.vertical .pkg-info {
+  padding: 12px 15px 15px;
+}
+
 .package-card-horizontal{flex-direction:row}
 .package-card-horizontal .pkg-image{flex:0 0 280px;width:280px;height:200px}
 
@@ -28,8 +53,7 @@
   overflow:hidden;
   cursor:pointer;
   width:100%;
-  height:unset;
-  padding-top: 67%; /* Aspect ratio 3:2 */
+  aspect-ratio: 16 / 9;
   box-shadow:0 8px 24px rgba(0,0,0,.5);
 }
 .pkg-image img{
@@ -64,19 +88,20 @@
 }
 
 /* Info */
-.pkg-info{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  padding:16px 20px 20px;
-  position:relative;
-  z-index:1;
-  color:#1f2937;
-  flex-grow:1;
-  justify-content:space-between;
+.pkg-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 15px;
+  position: relative;
+  z-index: 1;
+  color: #1f2937;
+  flex-grow: 1;
+  justify-content: flex-start;
 }
-.pkg-title{font-size:1.1rem;font-weight:700;color:#252e48;margin:0 0 4px}
-.pkg-duration{color:#e26d5c;font-weight:600;margin-bottom:4px;font-size:0.85rem}
+
+.pkg-title { font-size: 1rem; font-weight: 700; color: #252e48; margin: 0 0 4px; }
+.pkg-duration { display: inline-block; background: none; color: #16a34a; font-weight: 600; margin-bottom: 4px; font-size: 0.8rem; padding: 0; border-radius: 0; }
 .pkg-desc{color:#4a5568;line-height:1.3;margin:0 0 6px;font-size:0.8rem; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
 
 /* Incluye chips */
@@ -86,7 +111,7 @@
 .pkg-chip{background:#e6fffa;color:#2c7a7b;border:1px solid #b2f5ea;border-radius:10px;padding:3px 6px;font-size:.75rem}
 
 /* Footer precio + CTA */
-.pkg-footer{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 20px 20px;margin-top:auto;}
+.pkg-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 0; margin-top: auto; }
 .pkg-price{display:flex;align-items:baseline;gap:6px}
 .pkg-price .from{color:#718096;display:block;font-size:.5rem}
 .pkg-price .amount{color:#4b2504;font-size:1.2rem;font-weight:800}
@@ -112,40 +137,78 @@
   .pkg-image{flex:0 0 auto;height:unset;width:100%; padding-top: 67%;}
   .pkg-prices{grid-template-columns:1fr}
 }
-.package-card.compact{max-width:unset;margin:0 auto;flex-direction:row;
+.package-card.compact {
+  max-width: 100%;
+  margin: 0 auto;
+  flex-direction: row;
   padding: 0;
+  gap: 8px;
+}
+
+.package-card.compact .pkg-info {
+  padding: 10px;
+  justify-content: center;
+}
+
+.package-card.compact .pkg-title {
+  font-size: 0.9rem;
+}
+
+.package-card.compact .pkg-duration {
+  font-size: 0.75rem;
+}
+
+.package-card.compact .pkg-footer {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 /* Precios con badges de color */
 .pkg-prices{display:grid;grid-template-columns:1fr;gap:4px;margin:4px 0}
 .pkg-prices .price-row{width:100%;justify-self:stretch;gap:10px;padding:6px 10px;font-size:.75rem}
-.price-row{display:flex;align-items:center;justify-content:space-between;border-radius:9999px;padding:8px 14px;font-weight:700;color:#fff;gap:10px}
+.price-row{display:flex;align-items:center;justify-content:space-between;border-radius:9999px;padding:8px 14px;font-weight:700;color:#fff;gap:10px;background:#16a34a}
 .price-row span:last-child{font-size:clamp(.8rem,1.1vw,1rem);font-weight:800;line-height:1;margin-left:6px;letter-spacing:.01em}
 .price-row span:first-child{opacity:.95;font-size:.8rem;letter-spacing:.02em}
 /* Colores por tipo */
-.price-row.double{background:#2b0572; color:#0cd5f0;}
-.price-row.general{background:#2b0572; color:#0cd5f0;}
-.price-row.child{background:#2b0572; color:#0cd5f0;}
-.price-row.adult{background:#2b0572; color:#0cd5f0;}
-.price-row.custom{background:#2b0572; color:#0cd5f0;}
+.price-row.double{background:#16a34a; color:#fff;}
+.price-row.general{background:#16a34a; color:#fff;}
+.price-row.child{background:#16a34a; color:#fff;}
+.price-row.adult{background:#16a34a; color:#fff;}
+.price-row.custom{background:#16a34a; color:#fff;}
 /* Badge compacto para precios personalizados (solo texto) */
 .price-badge{display:inline-flex;align-items:center;justify-content:center;width:fit-content;margin:0 auto}
 /* Imagen compacta uniforme */
-.package-card.compact .pkg-image{height:unset;flex:0 0 240px;width:auto;padding-top: 67%;}
+.package-card.compact .pkg-image {
+  height: auto;
+  flex: 0 0 150px; /* Ancho de imagen más pequeño */
+  width: 150px;
+  padding-top: 0; /* Se anula para usar altura fija */
+  height: 100px; /* Altura fija para hacerla más compacta */
+}
+
+/* Variante vertical y pequeña: imagen arriba e info debajo */
+.package-card.small { max-width: 320px; }
+.package-card.vertical.small .pkg-image { flex: 0 0 auto; width: 100%; height: 160px; padding-top: 0; }
+.package-card.vertical.small .pkg-info { padding: 10px 12px; }
+.package-card.small .pkg-title { font-size: 0.95rem; }
+.package-card.small .pkg-duration { font-size: 0.75rem; }
+.package-card.small .pkg-footer { gap: 6px; }
+.package-card.small .pkg-prices .price-row { padding: 5px 8px; font-size: .7rem; }
+.btn-cta.cta-small { font-size: .68rem; padding: 4px 8px; }
 @media(max-width:480px){
-  .package-card{padding:0;border-radius:12px}
-  .package-card.compact{flex-direction:row;gap:8px}
-  .package-card.compact .pkg-image{height:unset;flex:0 0 45%;max-width:45%; padding-top: 67%;}
-  .pkg-info{padding:8px 10px}
-  .pkg-title{font-size:1rem}
-  .pkg-duration{font-size:0.8rem;margin-bottom:4px}
-  .pkg-chips{gap:4px}
-  .pkg-chip{padding:2px 5px;font-size:.68rem}
-  .pkg-footer{padding:0 10px 10px;gap:8px}
-  .pkg-prices{grid-template-columns:1fr}
-  .pkg-prices .price-row{padding:5px 8px;font-size:.7rem}
-  .price-row{border-radius:8px}
-  .pkg-prices .price-row{border-radius:8px}
-  .price-row span:first-child{font-size:.72rem}
-  .price-row span:last-child{font-size:.78rem}
-  .btn-cta.cta-small{font-size:.68rem;padding:3px 6px}
+  .package-card { padding: 0; border-radius: 12px; flex-direction: column; }
+  .package-card.compact { flex-direction: row; gap: 8px; }
+  .package-card.compact .pkg-image { flex: 0 0 40%; max-width: 40%; height: auto; padding-top: 28%; }
+  .pkg-info { padding: 8px 10px; }
+  .pkg-title { font-size: 0.9rem; }
+  .pkg-duration { font-size: 0.75rem; margin-bottom: 4px; }
+  .pkg-chips { gap: 4px; }
+  .pkg-chip { padding: 2px 5px; font-size: .68rem; }
+  .pkg-footer { padding: 0 10px 10px; gap: 8px; }
+  .pkg-prices { grid-template-columns: 1fr; }
+  .pkg-prices .price-row { padding: 5px 8px; font-size: .7rem; }
+  .price-row { border-radius: 8px; }
+  .price-row span:first-child { font-size: .7rem; }
+  .price-row span:last-child { font-size: .75rem; }
+  .btn-cta.cta-small { font-size: .68rem; padding: 3px 6px; }
 }

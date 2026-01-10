@@ -1,6 +1,6 @@
-.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;justify-content:center;align-items:center;z-index:1000}
-.lightbox-content{position:relative;max-width:90vw;max-height:90vh;display:flex;align-items:center;gap:12px}
-.lightbox-image{max-width:80vw;max-height:80vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;justify-content:center;align-items:center;z-index:2000}
+.lightbox-content{position:relative;max-width:95vw;max-height:95vh;display:flex;justify-content:center;align-items:center;gap:12px}
+.lightbox-image{width:auto;height:auto;max-width:95vw;max-height:95vh;object-fit:contain;display:block;margin:auto;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 .lb-btn{position:relative;background:var(--color-accent);color:#fff;border:none;border-radius:8px;width:44px;height:44px;font-size:28px;display:flex;justify-content:center;align-items:center;cursor:pointer;opacity:.9}
 .lb-btn:hover{opacity:1;background:#179a4d}
 .lb-prev{order:0}
@@ -10,3 +10,4 @@
 .lightbox-caption{position:absolute;left:12px;bottom:12px;max-width:70vw}
 .lightbox-caption h3{margin:0 0 4px 0}
 .lightbox-caption p{margin:0;color:#fff}
+@media(min-width:1024px){.lightbox-image{max-width:95vw;max-height:95vh;object-fit:contain}.lightbox-content{max-width:95vw;max-height:95vh}}

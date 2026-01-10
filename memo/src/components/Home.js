@@ -11,6 +11,8 @@ import homeContent from '../content/home.json';
 import company from '../content/company.json';
 import { openWhatsApp } from '../utils/whatsapp';
 import { AlbumsPreview } from './AlbumsFeature';
+import CompanyPage from './CompanyPage';
+import Team from './Team';
 
 const Home = ({ user }) => {
   const number = company.phone || "";
@@ -34,6 +36,8 @@ const Home = ({ user }) => {
           <DealsGrid />
         </section>
         <AlbumsPreview />
+        <CompanyPage embedded />
+        <Team />
 
       </div>
     </div>

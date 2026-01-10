@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { assetsOrigin } from "../utils/api";
 import "./PackageCard.css";
+import "./PackageCard.plain.css";
 import { formatMoney } from "../utils/formatMoney";
 import { formatDateRange } from "../utils/formatDateRange";
 import Lightbox from "./Lightbox";
+
 
 const buildImageSrc = (image) => {
   if (!image) return "https://via.placeholder.com/600x400?text=Paquete";
@@ -21,7 +23,17 @@ const stripCloudinaryTransforms = (url) => {
   }
 };
 
-const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
+const getDurationText = (pkg) => {
+  const range = formatDateRange(pkg?.startDate || pkg?.fechaInicio, pkg?.endDate || pkg?.fechaFin, { style: "short" });
+  if (range) return range;
+  const d = pkg?.duration || pkg?.duracion || pkg?.dateRange;
+  if (!d) return "Fechas a consultar";
+  if (typeof d === "string") return d;
+  if (typeof d === "object" && d.days != null && d.nights != null) return `${d.days} días ${d.nights} noches`;
+  return "";
+};
+
+const PackageCard = ({ pkg, className, hideItinerary, showIncludes, variant, enablePreview = false, plain = false }) => {
   const [showLb, setShowLb] = useState(false);
   const title = pkg?.name || pkg?.title || "Paquete";
   const rawImage = pkg?.mainPhotoUrl || pkg?.image || pkg?.coverImage || (Array.isArray(pkg?.photos) ? pkg.photos[0]?.url : undefined);
@@ -37,8 +49,13 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
       })
     : [{ src: stripCloudinaryTransforms(imgSrc), title }]
 );
-  const isCompact = typeof className === "string" && className.includes("compact");
-
+  const variantStr = typeof variant === "string" ? variant : (typeof className === "string" ? className : "");
+  const variantList = variantStr.split(/\s+/).filter(Boolean);
+  const hasVar = (v) => variantList.includes(v);
+  const isCompact = hasVar("compact");
+  const isVertical = hasVar("vertical");
+  const isSmall = hasVar("small");
+  const isBooking = hasVar("booking");
   const cur = (typeof pkg?.currency === "string" && pkg.currency.trim().toUpperCase() === "MXN") ? "MXN" : "USD";
   const generalRaw = pkg?.price ?? pkg?.generalPrice;
   const doubleRaw = pkg?.priceDouble ?? pkg?.doublePrice;
@@ -67,16 +84,61 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
   };
 
 
+  
+
+  if (plain) {
+    const dt = getDurationText(pkg);
+    return (
+      <article className="package-card-plain">
+        <div className="pkg-image-plain" onClick={() => { setShowLb(true); }}>
+          <img src={imgSrc} alt={title} />
+        </div>
+        <div className="pkg-info-plain">
+          {pkg?.category && <div className="pkg-category-plain">{pkg.category}</div>}
+          <h3 className="pkg-title-plain">{title}</h3>
+          {dt && <div className="pkg-duration-plain">{dt}</div>}
+          {(showIncludes) && includes.length > 0 && (
+            <div className="pkg-includes-plain">
+              <span className="label-plain">Incluye:</span>
+              <div className="pkg-chips-plain">
+                {includes.slice(0, 2).map((item, idx) => (
+                  <span key={idx} className="pkg-chip-plain">{item}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          <div className="pkg-footer-plain">
+            {(customPrice || customPrice2 || customPrice3 || customPrice4 || badges.length > 0) && (
+              <div className="pkg-prices-plain">
+                {customPrice && (<div className="price-row-plain">{customPrice}</div>)}
+                {customPrice2 && (<div className="price-row-plain">{customPrice2}</div>)}
+                {customPrice3 && (<div className="price-row-plain">{customPrice3}</div>)}
+                {customPrice4 && (<div className="price-row-plain">{customPrice4}</div>)}
+                {badges.map((b) => (
+                  <div key={b.key} className="price-row-plain">
+                    <span>{b.label}</span>
+                    <span>{b.amount}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Link to={pkg?._id ? `/packages/${pkg._id}` : "/"} className="btn-cta-plain">Ver oferta</Link>
+          </div>
+        </div>
+        {showLb && <Lightbox images={images} startIndex={0} onClose={() => setShowLb(false)} showControls={false} />}
+      </article>
+    );
+  }
+
   return (
-    <article className={`package-card ${className || ""}`}>
-        <div className="cards__item__pic-wrap pkg-image" onClick={() => setShowLb(true)}>
+    <article className={`package-card ${isCompact ? "compact" : ""} ${isVertical ? "vertical" : ""} ${isSmall ? "small" : ""} ${isBooking ? "booking" : ""} ${className || ""}`}>
+        <div className="cards__item__pic-wrap pkg-image" onClick={() => { setShowLb(true); }}>
           <img className='cards__item__img' src={imgSrc} alt={title} />
         </div>
         <div className="cards__item__info pkg-info">
           {pkg?.category && <div className="pkg-category">{pkg.category}</div>}
           <h3 className="cards__item__text pkg-title">{title}</h3>
         {renderDuration()}
-        {/* Descripción ocultada en la tarjeta; el itinerario se muestra solo en la vista de detalle */}
         {(showIncludes || isCompact) && includes.length > 0 && (
           <div className="pkg-includes">
             <span className="label">Incluye:</span>
@@ -113,7 +175,8 @@ const PackageCard = ({ pkg, className, hideItinerary, showIncludes }) => {
           <Link to={pkg?._id ? `/packages/${pkg._id}` : "/"} className="btn-cta cta-small">Ver oferta</Link>
         </div>
       </div>
-      {showLb && <Lightbox images={images} startIndex={0} onClose={() => setShowLb(false)} />}
+      {showLb && <Lightbox images={images} startIndex={0} onClose={() => setShowLb(false)} showControls={false} />}
+      
     </article>
   );
 };

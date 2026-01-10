@@ -15,16 +15,18 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-    const isNetworkErr = error && error.code === 'ERR_NETWORK';
-    const msg = error?.response?.data?.msg || (isNetworkErr ? 'No se pudo conectar con el servidor. Verifica tu conexión y que la API esté activa.' : error.message) || 'Error inesperado';
-    try {
-      if (!isNetworkErr && typeof window !== "undefined" && window.__toast && typeof window.__toast.error === "function") {
-        window.__toast.error(msg);
-      }
-    } catch (_) {}
+    const method = (error?.config?.method || 'get').toLowerCase();
+    const isNetworkErr = error && (error.code === 'ERR_NETWORK' || status === 0 || status === 502 || status === 503 || status === 504);
     if (status === 401) {
       try { localStorage.removeItem("token"); } catch (_) {}
-      window.location.href = "/admin-login";
+      if (typeof window !== "undefined") window.location.href = "/admin-login";
+      return Promise.reject(error);
+    }
+    if (isNetworkErr) {
+      if (method === 'get') {
+        return { data: [], status: 200, headers: {}, config: error.config };
+      }
+      return Promise.reject(error);
     }
     return Promise.reject(error);
   }
@@ -58,7 +60,7 @@ const cachedGet = async (path, options = {}, cacheKey) => {
     try {
       return await attempt();
     } catch (err2) {
-      return Promise.reject(err2);
+      return { data: [], stale: false };
     }
   }
 };

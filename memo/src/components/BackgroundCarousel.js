@@ -1,46 +1,43 @@
-import React, { useEffect, useState } from "react";
-import "./BackgroundCarousel.css";
+import React, { useEffect, useState } from "react";import { useLocation } from "react-router-dom";import "./BackgroundCarousel.css";
 
-const imageFiles = ["R (2).jfif", "Tours.jfif", "acapulco-baie.jfif", "europa.jfif", "europa2.jfif", "la-habana-2.jfif"];
-const version = "?v=2";
-const images = imageFiles.map(file => `/imagenes-fondo/${file}${version}`);
-const fallback = `/memo-logo.jfif${version}`;
+const fallback = "/memo-logo.jfif?v=3";
+
+// Mapeo de imagen por ruta (usando archivos disponibles actualmente)
+const routeBackgrounds = {
+  "/": "/imagenes-fondo/acapulco-baie.jfif?v=3",
+  "/paquetes": "/imagenes-fondo/Tours.jfif?v=3",
+  "/albums": "/imagenes-fondo/europa.jfif?v=3",
+  "/album": "/imagenes-fondo/europa2.jfif?v=3",
+  "/company": "/imagenes-fondo/la-habana-2.jfif?v=3",
+  "/team": "/imagenes-fondo/la-habana-2.jfif?v=3"
+};
+
+function pickSrc(pathname) {
+  if (pathname.startsWith("/packages/")) return routeBackgrounds["/paquetes"] || routeBackgrounds["/"];
+  if (pathname.startsWith("/albums/")) return routeBackgrounds["/albums"] || routeBackgrounds["/"];
+  return routeBackgrounds[pathname] || routeBackgrounds["/"];
+}
 
 const BackgroundCarousel = () => {
+  const location = useLocation();
   const [slides, setSlides] = useState([fallback]);
   const [index, setIndex] = useState(0);
 
-  // Pre-carga de imágenes con reemplazo en caso de error
+  // Fondo estático: precarga según la ruta actual con fallback
   useEffect(() => {
     let cancelled = false;
-    Promise.all(
-      images.map(src => new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => resolve(src);
-        img.onerror = () => resolve(fallback);
-        img.src = src;
-      }))
-    ).then(result => { if (!cancelled) { setSlides(result); setIndex(0); } });
+    const src = pickSrc(location.pathname);
+    const img = new Image();
+    img.onload = () => { if (!cancelled) { setSlides([src]); setIndex(0); } };
+    img.onerror = () => { if (!cancelled) { setSlides([fallback]); setIndex(0); } };
+    img.src = src;
     return () => { cancelled = true; };
-  }, []);
-
-  // Avance cíclico seguro usando la longitud real de slides
-  useEffect(() => {
-    if (slides.length <= 1) return;
-    const t = setInterval(() => {
-      setIndex(i => (i + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(t);
-  }, [slides.length]);
+  }, [location.pathname]);
 
   return (
     <div className="bg-carousel" aria-hidden="true">
       {slides.map((src, i) => (
-        <div
-          key={i}
-          className={`bg-slide ${i === index ? "active" : ""}`}
-          style={{ backgroundImage: `url(${src})` }}
-        />
+        <div key={i} className={`bg-slide ${i === index ? "active" : ""}`} style={{ backgroundImage: `url(${src})` }} />
       ))}
       <div className="bg-overlay" />
     </div>

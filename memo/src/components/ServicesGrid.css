@@ -4,7 +4,20 @@
 }
 
 .service-image.clickable:hover {
-  transform: scale(1.03);
+  transform: scale(1.06) rotateZ(-0.5deg);
 }
 
-.services-grid{padding:2rem 1rem;max-width:1100px;margin:0 auto}.services-grid h2{text-align:center;margin-bottom:40px;font-size:56px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}.services-grid .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}.services-grid .card{background:rgba(255,255,255,0.92);border:1px solid var(--color-accent,#1FAA59);border-radius:12px;padding:1rem;box-shadow:0 4px 12px rgba(0,0,0,.08)}.services-grid .service-image{width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:.5rem;box-shadow:0 2px 8px rgba(0,0,0,.08)}.services-grid .icon{font-size:1.4rem;color:var(--color-primary,#0056B3)}.services-grid h3{font-size:1.1rem;margin:.4rem 0;color:#0b0f1a}.services-grid p{font-size:.95rem;color:#333;line-height:1.5}
+.services-grid{padding:2rem 1rem;max-width:1100px;margin:0 auto}.services-grid h2{text-align:center;margin-bottom:40px;font-size:56px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.85),0 0 6px rgba(0,0,0,.65),0 0 18px rgba(31,170,89,.35)}.services-grid .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}.services-grid .card{display:flex;flex-direction:column;min-height:380px;background:rgba(255,255,255,0.95);border:1px solid var(--color-accent,#1FAA59);border-radius:28px;padding:1.1rem;box-shadow:0 8px 24px rgba(0,0,0,.12);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;will-change:transform,box-shadow;animation:serviceFadeUp 480ms ease both}.services-grid .service-image{width:100%;height:180px;object-fit:cover;border-radius:20px;margin-bottom:.75rem;box-shadow:0 6px 16px rgba(0,0,0,.10)}.services-grid .icon{font-size:1.4rem;color:var(--color-primary,#0056B3)}.services-grid h3{font-size:1.2rem;font-weight:700;margin:.5rem 0;color:#0b0f1a;text-shadow:0 1px 1px rgba(0,0,0,.06)}.services-grid p{font-size:1rem;color:#334155;line-height:1.6}.services-grid .card:hover{transform:scale(1.03) translateY(-3px) rotateZ(-0.5deg);box-shadow:0 12px 30px rgba(0,0,0,.16);z-index:2}.services-grid .grid .card:nth-child(1){animation-delay:80ms}.services-grid .grid .card:nth-child(2){animation-delay:140ms}.services-grid .grid .card:nth-child(3){animation-delay:200ms}@keyframes serviceFadeUp{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}.service-card.active{border-color:var(--color-primary,#0056B3);box-shadow:0 12px 32px rgba(0,0,0,.18),0 0 0 3px var(--color-primary,#0056B3);transform:scale(1.03) translateY(-3px)}.service-card.active h3{color:var(--color-primary,#0056B3)}.service-card.active .btn{background-color:var(--color-primary,#0056B3)}.service-card.active .btn.btn-secondary{color:var(--color-primary,#0056B3);border-color:var(--color-primary,#0056B3)}
+
+/* Tipografía para títulos de servicios en Home */
+.home-services .service-card h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; }
+/* Tipografía del título de sección en Home */
+.home-services h2 { font-family: 'Playfair Display', serif; font-weight: 700; }
+/* Colores por tema (títulos de tarjetas) */
+.service-card.theme-hoteles h3 { color: #0fa3b1; }
+.service-card.theme-nacionales h3 { color: #e67e22; }
+.service-card.theme-pasadias h3 { color: #10b981; }
+.service-card.theme-internacionales h3 { color: #1f98f4; }
+.service-card.theme-europa h3 { color: #6c5ce7; }
+.service-card.theme-renta-vehiculos h3 { color: #f39c12; }
+.card-actions{margin-top:auto;display:flex;justify-content:flex-end;gap:.5rem}

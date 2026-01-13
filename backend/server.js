@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
+const compression = require('compression');
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -38,12 +39,19 @@ const corsOptions = {
       return callback(null, true);
     }
   },
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
-  credentials: true
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type','Authorization','Cache-Control','cache-control']
 };
 app.use(cors(corsOptions));
 app.use(express.json());
+// Habilitar compresión HTTP y Keep-Alive
+app.use(compression());
+app.use((req, res, next) => {
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Keep-Alive', 'timeout=5, max=100');
+  next();
+});
 
 // Desactivar buffer de comandos para no encolar operaciones cuando la DB está desconectada
 mongoose.set('bufferCommands', false);
@@ -84,10 +92,24 @@ mongoose.connection.on('disconnected', () => {
 
 const connectPromise = connectDB();
 
+// Warm-up: precargar consultas frecuentes para acelerar el primer request
+const warmUp = async () => {
+  try {
+    const Package = require('./models/Package');
+    await Package.find({}).limit(1).lean();
+    await Package.find({ popular: true }).limit(5).lean();
+    console.log('Warm-up completado');
+  } catch (e) {
+    console.warn('Warm-up falló:', e && e.message ? e.message : e);
+  }
+};
+connectPromise.then(() => warmUp());
+
 
 
 // Rutas
 app.use('/api', (req, res, next) => {
+  if (req.method === 'OPTIONS') return next();
   if (req.path === '/health') return next();
   if (!isConnected) {
     return res.status(503).json({ error: 'Servicio temporalmente no disponible', detail: 'Sin conexión a la base de datos', retryAfterMs: 5000 });
@@ -129,12 +151,17 @@ if (!isProd) {
 app.use((req, res) => {
   res.status(404).json({ message: 'Not Found' });
 });
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 5000;
 
 if (require.main === module) {
   (async () => {
     await connectPromise;
-    app.listen(port, '0.0.0.0', () => console.log(`Servidor corriendo en puerto ${port}`));
+    const server = app.listen(port, '0.0.0.0', () => console.log(`Servidor corriendo en puerto ${port}`));
+    // Ajustes de timeouts para mantener conexiones HTTP/1.1 vivas y evitar cierres prematuros
+    server.keepAliveTimeout = 65000;
+    server.headersTimeout = 66000;
+    // Ejecutar warm-up también en modo local
+    await warmUp();
   })();
 }
 

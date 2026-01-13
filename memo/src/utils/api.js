@@ -64,11 +64,14 @@ const cachedGet = async (path, options = {}, cacheKey) => {
     }
   }
 };
-export const getAlbums = () => cachedGet('/albums', undefined, 'cache:albums');
+export const getAlbums = (params = {}) => cachedGet(`/albums${toQuery(params)}`, undefined, `cache:albums:${JSON.stringify(params)}`);
 export const createAlbum = (payload) => api.post('/albums', payload);
 export const updateAlbum = (id, payload) => api.put(`/albums/${id}`, payload);
 export const deleteAlbum = (id) => api.delete(`/albums/${id}`);
-export const getPackages = () => cachedGet('/packages', undefined, 'cache:packages');
+export const getPendingAlbums = () => api.get(`/albums/pending?_ts=${Date.now()}`);
+export const approveAlbum = (id) => api.put(`/albums/${id}/approve`);
+const toQuery = (params = {}) => { const entries = Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== ''); if (entries.length === 0) return ''; const usp = new URLSearchParams(); for (const [k, v] of entries) { usp.append(k, v); } return `?${usp.toString()}`; }; export const getPackages = (params = {}) => cachedGet(`/packages${toQuery(params)}`, undefined, `cache:packages:${JSON.stringify(params)}`);
+export const getPackagesLive = async (params = {}) => { const qs = toQuery(params); const ts = Date.now(); const sep = qs ? '&' : '?'; return api.get(`/packages${qs}${sep}_ts=${ts}`, { timeout: 7000 }); };
 export const getAlbumPhotos = (id, params = {}) => api.get(`/albums/${id}/photos`, { params });
 export const uploadPhoto = (formData) => api.post('/photos/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const createAlbumWithCover = async (name, file) => {

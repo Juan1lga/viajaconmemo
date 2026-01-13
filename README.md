@@ -44,6 +44,13 @@ Las variables `.env` están ignoradas en el repositorio.
   ```
   La aplicación se abrirá en `http://localhost:3000/` por defecto.
 
+### Salud del backend y splash
+- El frontend muestra una pantalla de carga inicial hasta que el endpoint `/health` confirme estado `ok` y base de datos conectada.
+- Para desarrollar sin splash, establece `REACT_APP_SKIP_SPLASH=1` en `memo/.env`.
+
+### Transiciones de página
+- Se habilitó un overlay de transición al cambiar de rutas para una UX más fluida.
+
 ## Notas
 - Los directorios de subida de archivos (`backend/uploads/`) y las carpetas de configuración de despliegue (`backend/.vercel/` y `memo/.vercel/`) están ignorados por Git.
 - Git LFS está configurado para rastrear imágenes (`*.jpg`, `*.jpeg`, `*.png`, `*.webp`). Si no tienes instalado Git LFS, descárgalo desde https://git-lfs.com e instala con:

@@ -22,14 +22,16 @@ const PackageSchema = new mongoose.Schema({
   startDate: { type: Date },
   endDate: { type: Date },
   // Categoría con nueva opción de fin de semana
-  category: { type: String, enum: ['Populares','Lujo','Económicos','Ofertas de fin de semana'], default: 'Populares' },
+  category: { type: String, enum: ['Hoteles en la Riviera Maya','Hoteles Nacionales','Nuestros paquetes nacionales','Nuestros pasadías','Nuestros paquetes internacionales','Nuestros viajes a Europa','Renta de vehículos'], default: 'Nuestros paquetes nacionales' },
   // Itinerario detallado
   itinerary: { type: String, default: '' },
   includes: { type: [String], default: [] },
   popular: { type: Boolean, default: false },
   image: { type: String, required: true },
   // URL principal para la foto del paquete (alias de image)
-  mainPhotoUrl: { type: String, default: '' }
+  mainPhotoUrl: { type: String, default: '' },
+  // Mes específico de viaje en formato YYYY-MM para filtrar
+  travelMonth: { type: String, default: '' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Package', PackageSchema);

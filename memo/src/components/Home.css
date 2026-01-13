@@ -4,3 +4,37 @@
   padding: 0 1rem;
 }
 .logo-right{display:flex;justify-content:flex-end;padding:.5rem 1rem}
+
+/* Mejora de contraste y efectos en títulos del Home */
+.home .section-title{
+  color:#fff;
+  text-shadow:0 2px 4px rgba(0,0,0,.85),0 0 8px rgba(0,0,0,.65),0 0 18px rgba(31,170,89,.35);
+  letter-spacing:.3px;
+  -webkit-text-stroke:0.5px rgba(0,0,0,.25);
+}
+.home .section-subtitle{
+  color:#f1f5f9;
+  text-shadow:0 1px 2px rgba(0,0,0,.4);
+}
+.home .cta-block{backdrop-filter:saturate(120%) contrast(110%)}
+
+/* Botón de WhatsApp con alto contraste y animación suave */
+.whatsapp-btn{
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:.8rem 1.4rem;
+  font-weight:700;
+  box-shadow:0 8px 20px rgba(18,140,126,.35);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.whatsapp-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 12px 28px rgba(18,140,126,.45)}
+.whatsapp-btn:active{transform:scale(0.98)}
+
+/* Animación suave para tarjetas de álbumes */
+.album-card{transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;will-change:transform, box-shadow, filter}
+.album-card:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 10px 24px rgba(0,0,0,.16) !important;filter:saturate(110%) contrast(105%)}
+.album-card img{transition:transform .25s ease, filter .25s ease}
+.album-card:hover img{transform:scale(1.03);filter:brightness(1.02)}
+.album-card:active{transform:translateY(0) scale(0.995);box-shadow:0 6px 16px rgba(0,0,0,.14) !important}

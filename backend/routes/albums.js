@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createAlbum, getAlbums, getAlbumPhotos, updateAlbum, deleteAlbum } = require('../controllers/albumController');
+const { createAlbum, getAlbums, getAlbumPhotos, updateAlbum, deleteAlbum, getPendingAlbums, approveAlbum } = require('../controllers/albumController');
 const auth = require('../middleware/auth');
 const multer = require('multer');
 
@@ -36,10 +36,20 @@ const handleMulter = (mw) => (req, res, next) => {
 // @access  Public
 router.get('/', getAlbums);
 
-// @route   POST api/albums
-// @desc    Crear un álbum
+// @route   GET api/albums/pending
+// @desc    Listar álbumes pendientes de aprobación
 // @access  Private (admin)
-router.post('/', auth, handleMulter(upload.single('cover')), createAlbum);
+router.get('/pending', auth, getPendingAlbums);
+
+// @route   PUT api/albums/:id/approve
+// @desc    Aprobar un álbum
+// @access  Private (admin)
+router.put('/:id/approve', auth, approveAlbum);
+
+// @route   POST api/albums
+// @desc    Crear un álbum (cualquier usuario)
+// @access  Public
+router.post('/', handleMulter(upload.single('cover')), createAlbum);
 
 // @route   GET api/albums/:id/photos
 // @desc    Obtener fotos de un álbum (usar ?approved=true para solo aprobadas)

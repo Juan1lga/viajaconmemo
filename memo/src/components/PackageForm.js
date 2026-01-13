@@ -18,7 +18,8 @@ const PackageForm = ({ token }) => {
   const [priceChild, setPriceChild] = useState('');
 
   const [duration, setDuration] = useState('');
-  const [category, setCategory] = useState('Populares');
+  const [travelMonth, setTravelMonth] = useState('');
+  const [category, setCategory] = useState('Nuestros paquetes nacionales');
   const [includesInput, setIncludesInput] = useState('');
   const [popular, setPopular] = useState(false);
   const [imageFile, setImageFile] = useState(null);
@@ -39,12 +40,13 @@ const PackageForm = ({ token }) => {
         setPriceCustom4(pkg.priceCustom4 != null ? String(pkg.priceCustom4) : '');
         setImage(pkg.image);
         setDuration(pkg.duration || '');
-        setCategory((pkg.category === 'Popular' || pkg.category === 'Populares' || pkg.category === 'Lujo' || pkg.category === 'Económicos' || pkg.category === 'Ofertas de fin de semana') ? (pkg.category === 'Popular' ? 'Populares' : pkg.category) : 'Populares');
+        setCategory((['Hoteles en la Riviera Maya','Nuestros paquetes nacionales','Nuestros pasadías','Nuestros paquetes internacionales','Nuestros viajes a Europa'].includes(pkg.category)) ? pkg.category : 'Nuestros paquetes nacionales');
         setIncludesInput(Array.isArray(pkg.includes) ? pkg.includes.join(', ') : (pkg.includes || ''));
         setPopular(Boolean(pkg.popular));
         setCurrency((pkg.currency === 'MXN' || pkg.currency === 'USD') ? pkg.currency : 'USD');
         setPriceDouble(pkg.priceDouble != null ? String(pkg.priceDouble) : '');
         setPriceChild(pkg.priceChild != null ? String(pkg.priceChild) : '');
+        setTravelMonth(pkg.travelMonth || '');
 
 
 
@@ -70,6 +72,7 @@ const PackageForm = ({ token }) => {
     formData.append('priceChild', priceChild);
 
     formData.append('duration', duration);
+    formData.append('travelMonth', travelMonth);
     formData.append('category', category);
     formData.append('includes', includesInput);
     formData.append('popular', popular);
@@ -149,12 +152,18 @@ const PackageForm = ({ token }) => {
             <input type='text' className='form-control' placeholder='Ej: Enero 2025 o fechas a consultar' value={duration} onChange={(e) => setDuration(e.target.value)} />
           </div>
           <div className="col-md-6">
+            <label className="form-label">Mes</label>
+            <input type='month' className='form-control' value={travelMonth} onChange={(e) => setTravelMonth(e.target.value)} />
+          </div>
+          <div className="col-md-6">
             <label className="form-label">Categoría</label>
             <select className='form-select' value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value='Populares'>Populares</option>
-              <option value='Lujo'>Lujo</option>
-              <option value='Económicos'>Económicos</option>
-              <option value='Ofertas de fin de semana'>Ofertas de fin de semana</option>
+              <option value='Hoteles en la Riviera Maya'>Hoteles en la Riviera Maya</option>
+              <option value='Nuestros paquetes nacionales'>Nuestros paquetes nacionales</option>
+              <option value='Nuestros pasadías'>Nuestros pasadías</option>
+              <option value='Nuestros paquetes internacionales'>Nuestros paquetes internacionales</option>
+              <option value='Nuestros viajes a Europa'>Nuestros viajes a Europa</option>
+
             </select>
           </div>
           <div className="col-12">

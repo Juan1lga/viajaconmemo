@@ -4,6 +4,7 @@ import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import CompraPaquetes from './components/CompraPaquetes';
 import PackageDetails from './components/PackageDetails';
+import ServiceDetail from './components/ServiceDetail';
 import Navbar from './components/Navbar';
 import PhotoAlbum from './components/PhotoAlbum';
 import CompanyPage from './components/CompanyPage';
@@ -14,20 +15,46 @@ import UserManagement from './components/UserManagement';
 import WorkerManagement from './components/WorkerManagement';
 import AdminRoute from './components/AdminRoute';
 import Checkout from './components/Checkout';
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import AdminAlbums from './components/AdminAlbums';
+import React, { useState, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Footer from './components/Footer';
 import BackgroundCarousel from './components/BackgroundCarousel';
 import BackButton from './components/BackButton';
 import { AlbumsPage, AlbumDetailPage } from './components/AlbumsFeature';
 import api, { getPackages, getAlbums } from './utils/api';
 import LoadingSplash from './components/LoadingSplash';
+import PageTransitionOverlay from './components/PageTransitionOverlay';
+
+const RouteTransition = ({ disabled }) => {
+  const location = useLocation();
+  const [show, setShow] = useState(false);
+  const timerRef = useRef(null);
+  useEffect(() => {
+    if (timerRef.current) { clearTimeout(timerRef.current); }
+    if (disabled) {
+      document.body.classList.remove('app-transitioning');
+      setShow(false);
+      return () => {};
+    }
+    document.body.classList.add('app-transitioning');
+    setShow(true);
+    timerRef.current = setTimeout(() => {
+      document.body.classList.remove('app-transitioning');
+      setShow(false);
+    }, 2000);
+    return () => { if (timerRef.current) { clearTimeout(timerRef.current); } };
+  }, [location.pathname, disabled]);
+  return show ? <PageTransitionOverlay /> : null;
+};
 
 
 // Componente principal de la aplicación
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [isBooting, setIsBooting] = useState(true);
+  const skipSplash = process.env.REACT_APP_SKIP_SPLASH === '1';
+  const aliveRef = useRef(true);
 
 
   useEffect(() => {
@@ -40,32 +67,39 @@ function App() {
 
   // Esperar a que el backend confirme salud y conexión a la base de datos antes de ocultar el splash
   useEffect(() => {
-    let alive = true;
-    const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-    const probe = async () => {
-      while (alive) {
-        try {
-          const { data } = await api.get('/health', { timeout: 4000 });
-          const ok = data && data.status === 'ok';
-          const connected = !!(data && data.db && data.db.connected === true);
-          if (ok && connected) {
-            setIsBooting(false);
-            try { getPackages(); getAlbums(); } catch (_) {}
-            return;
-          }
-        } catch (_) {}
-        await delay(1500);
-      }
+    if (skipSplash) { setIsBooting(false); return; }
+    aliveRef.current = true;
+    const minSplashMs = 900;
+    const startedAt = Date.now();
+    const maxHideTimer = setTimeout(() => { if (aliveRef.current) setIsBooting(false); }, 4000);
+    let intervalId = null;
+    let hideTimerId = null;
+    const attempt = async () => {
+      try {
+        const { data } = await api.get('/health', { timeout: 4000 });
+        const ok = data && data.status === 'ok';
+        const connected = !!(data && data.db && data.db.connected === true);
+        if (ok && connected) {
+          clearTimeout(maxHideTimer);
+          if (intervalId) { clearInterval(intervalId); }
+          const elapsed = Date.now() - startedAt;
+          const wait = Math.max(0, minSplashMs - elapsed);
+          hideTimerId = setTimeout(() => { if (aliveRef.current) setIsBooting(false); }, wait);
+          try { getPackages(); getAlbums(); } catch (_) {}
+        }
+      } catch (_) {}
     };
-    probe();
-    return () => { alive = false; };
-  }, []);
+    intervalId = setInterval(() => { if (aliveRef.current) attempt(); }, 1500);
+    attempt();
+    return () => { aliveRef.current = false; clearTimeout(maxHideTimer); if (intervalId) clearInterval(intervalId); if (hideTimerId) clearTimeout(hideTimerId); };
+  }, [skipSplash]);
 
   return (
     <ToastProvider>
       <Router>
         <div className="App">
-{isBooting && <LoadingSplash />}
+{isBooting && !skipSplash && <LoadingSplash />}
+        <RouteTransition disabled={isBooting && !skipSplash} />
         <Navbar />
         <BackButton />
         <BackgroundCarousel />
@@ -81,6 +115,7 @@ function App() {
             <Route path="/albums/:id" element={<AlbumDetailPage />} />
             <Route path="/company" element={<CompanyPage />} />
             <Route path="/team" element={<Team />} />
+            <Route path="/servicios/:slug" element={<ServiceDetail />} />
 
             {/* Ruta pública para la compra de paquetes */}
             <Route path="/paquetes" element={<CompraPaquetes />} />
@@ -141,6 +176,14 @@ function App() {
                   <PackageForm token={token} />
                 </AdminRoute>
               } 
+            />
+            <Route
+              path="/admin/albums"
+              element={
+                <AdminRoute>
+                  <AdminAlbums token={token} />
+                </AdminRoute>
+              }
             />
             
             {/* Redirección para rutas no encontradas */}

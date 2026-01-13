@@ -5,23 +5,85 @@ const path = require('path');
 const fs = require('fs').promises;
 const { configured, uploadBuffer, deleteByUrl, isCloudinaryUrl } = require('../utils/cloudinary');
 
+const PACKAGES_CACHE_TTL_MS = Number(process.env.PACKAGES_CACHE_TTL_MS || 60000);
+const packagesCache = new Map();
+const getCacheKey = (query) => {
+  const category = (typeof query.category === 'string' ? query.category.trim() : '');
+  const popularRaw = (typeof query.popular === 'string' ? query.popular.trim().toLowerCase() : '');
+  const popular = popularRaw === 'true' ? 't' : (popularRaw === 'false' ? 'f' : '');
+  const month = (typeof query.month === 'string' ? query.month.trim() : '');
+  return `c:${category}|p:${popular}|m:${month}`;
+};
+const cacheGet = (key) => {
+  const entry = packagesCache.get(key);
+  if (!entry) return null;
+  if (entry.expires <= Date.now()) {
+    packagesCache.delete(key);
+    return null;
+  }
+  return entry.data;
+};
+const cacheSet = (key, data) => {
+  try {
+    packagesCache.set(key, { data, expires: Date.now() + PACKAGES_CACHE_TTL_MS });
+  } catch {}
+};
+const cacheClear = () => {
+  packagesCache.clear();
+};
+
+/* SSE clients for packages updates */
+const packagesSseClients = new Set();
+const broadcastPackagesChanged = () => {
+  const payload = JSON.stringify({ type: 'packages_changed', ts: Date.now() });
+  packagesSseClients.forEach((res) => {
+    try {
+      res.write('event: packages_changed\n');
+      res.write(`data: ${payload}\n\n`);
+    } catch (_) {}
+  });
+};
+exports.registerPackagesStream = (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  if (typeof res.flushHeaders === 'function') { try { res.flushHeaders(); } catch (_) {} }
+  try { res.write(': connected\n\n'); } catch (_) {}
+  packagesSseClients.add(res);
+  req.on('close', () => {
+    packagesSseClients.delete(res);
+    try { res.end(); } catch (_) {}
+  });
+};
 
 // Obtener todos los paquetes
 
 exports.getPackages = async (req, res) => {
   try {
+    const key = getCacheKey(req.query || {});
+    const cached = cacheGet(key);
+    if (cached) {
+      res.setHeader('Cache-Control','no-store');
+      return res.json(cached);
+    }
     const filter = {};
-    const { category, popular } = req.query || {};
+    const { category, popular, month } = req.query || {};
     if (typeof category === 'string' && category.trim()) {
       const cat = category.trim();
-      const normalized = (cat === 'Popular') ? 'Populares' : cat;
-      const allowed = ['Populares','Lujo','Económicos','Ofertas de fin de semana'];
-      if (allowed.includes(normalized)) filter.category = normalized;
+      const allowed = ['Hoteles en la Riviera Maya','Hoteles Nacionales','Nuestros paquetes nacionales','Nuestros pasadías','Nuestros paquetes internacionales','Nuestros viajes a Europa','Renta de vehículos'];
+      if (allowed.includes(cat)) filter.category = cat;
     }
     if (popular === 'true') filter.popular = true;
     if (popular === 'false') filter.popular = false;
+    if (typeof month === 'string' && month.trim()) {
+      const m = month.trim();
+      if (/^\d{4}-\d{2}$/.test(m)) filter.travelMonth = m;
+    }
 
     const packages = await Package.find(filter).lean();
+    cacheSet(key, packages);
+    res.setHeader('Cache-Control','no-store');
     res.json(packages);
   } catch (err) {
     console.error('getPackages failed:', err);
@@ -124,6 +186,8 @@ exports.createPackage = async (req, res) => {
 
     const currencyNormalized = (typeof currency === 'string' && (currency.trim().toUpperCase() === 'MXN' || currency.trim().toUpperCase() === 'USD')) ? currency.trim().toUpperCase() : 'USD';
 
+    const travelMonthNormalized = (typeof req.body?.travelMonth === 'string' && /^\d{4}-\d{2}$/.test(req.body.travelMonth.trim())) ? req.body.travelMonth.trim() : '';
+
     const newPkg = new Package({
       name,
       description: description || '',
@@ -140,15 +204,18 @@ exports.createPackage = async (req, res) => {
       duration: duration || '',
       startDate: start,
       endDate: end,
-      category: (category && ['Populares','Lujo','Económicos','Ofertas de fin de semana'].includes(category)) ? category : 'Populares',
+      category: (category && ['Hoteles en la Riviera Maya','Hoteles Nacionales','Nuestros paquetes nacionales','Nuestros pasadías','Nuestros paquetes internacionales','Nuestros viajes a Europa','Renta de vehículos'].includes(category)) ? category : 'Nuestros paquetes nacionales',
       itinerary: itinerary || '',
       includes: includesArray,
       popular: popularFlag,
       image: imageUrl,
-      mainPhotoUrl: imageUrl
+      mainPhotoUrl: imageUrl,
+      travelMonth: travelMonthNormalized
     });
 
     const saved = await newPkg.save();
+    cacheClear();
+    broadcastPackagesChanged();
     res.status(201).json(saved);
   } catch (err) {
     console.error('Error al crear paquete:', err.message);
@@ -175,9 +242,8 @@ exports.updatePackage = async (req, res) => {
 
   if (duration !== undefined) packageFields.duration = duration;
   if (category !== undefined) {
-    let cat = category;
-    if (cat === 'Popular') cat = 'Populares';
-    packageFields.category = ['Populares','Lujo','Económicos','Ofertas de fin de semana'].includes(cat) ? cat : 'Populares';
+    const cat = category;
+    packageFields.category = ['Hoteles en la Riviera Maya','Hoteles Nacionales','Nuestros paquetes nacionales','Nuestros pasadías','Nuestros paquetes internacionales','Nuestros viajes a Europa','Renta de vehículos'].includes(cat) ? cat : 'Nuestros paquetes nacionales';
   }
 
   if (includes !== undefined) {
@@ -294,6 +360,11 @@ exports.updatePackage = async (req, res) => {
   if (start !== undefined) packageFields.startDate = start;
   if (end !== undefined) packageFields.endDate = end;
 
+  if (req.body.travelMonth !== undefined) {
+    const tm = typeof req.body.travelMonth === 'string' ? req.body.travelMonth.trim() : '';
+    packageFields.travelMonth = /^\d{4}-\d{2}$/.test(tm) ? tm : '';
+  }
+
   // La imagen se manejará más adelante (posible subida a Blob en producción)
   if (!req.file && typeof image === 'string' && image.trim()) {
     const img = image.trim();
@@ -338,6 +409,8 @@ exports.updatePackage = async (req, res) => {
       { new: true }
     );
 
+    cacheClear();
+    broadcastPackagesChanged();
     res.json(pkg);
   } catch (err) {
     console.error('Error al actualizar paquete:', err.message);
@@ -368,6 +441,8 @@ exports.deletePackage = async (req, res) => {
       }
     }
     await Package.findByIdAndDelete(id);
+    cacheClear();
+    broadcastPackagesChanged();
     res.json({ msg: 'Paquete eliminado' });
   } catch (err) {
     console.error('Error al eliminar paquete:', err.message);

@@ -12,7 +12,7 @@
   filter: drop-shadow(0 6px 20px rgba(56, 125, 255, 0.017));
   overflow: hidden;
   text-decoration: none;
-  transition: transform 220ms ease, box-shadow 220ms ease;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   will-change: transform, box-shadow;
 }
 
@@ -124,11 +124,11 @@
 /* Hover y entrada: consistente con travel-card */
 .package-card:hover{
   z-index:2;
-  transform:translateY(-6px) scale(1.02);
-  box-shadow:0 12px 28px rgba(56,125,255,.25);
+  transform: translateY(-10px) scale(1.04);
+  box-shadow: 0 20px 40px rgba(56, 125, 255, 0.4);
 }
 .package-card:hover .pkg-image img{
-  transform:scale(1.06);
+  transform:scale(1.1);
 }
 
 /* Responsive */

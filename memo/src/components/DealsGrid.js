@@ -37,7 +37,7 @@ const DealsGrid = () => {
       {!loading && !error && (
         <div className="deals-list">
           {packages
-            .filter(p => p.popular === true || p.category === 'Populares')
+            .filter(p => p.popular === true)
             .slice(0, 8)
             .map((pkg) => (
               <PackageCard key={pkg._id} pkg={pkg} plain showIncludes />

@@ -18,6 +18,7 @@
     "bcryptjs": "^3.0.3",
     "conekta": "^3.3.1",
     "cors": "^2.8.5",
+    "compression": "^1.7.4",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "firebase-admin": "^12.6.0",

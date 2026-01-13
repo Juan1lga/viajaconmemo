@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
+import { useAutoRefreshPackages } from '../hooks/useAutoRefresh';
 import { Link } from 'react-router-dom';
 
 
@@ -10,22 +11,16 @@ import './AdminDashboard.css';
 import Logo from './Logo';
 
 const AdminDashboard = ({ token, setToken }) => {
-  const [packages, setPackages] = useState([]);
+  const { data: packages, refetchNow } = useAutoRefreshPackages({}, 2000);
   
   
 
-  useEffect(() => {
-    const fetchPackages = async () => {
-      const res = await api.get('/packages');
-      setPackages(res.data);
-    };
-    fetchPackages();
-  }, [token]);
+  // auto-refresh de paquetes manejado por useAutoRefreshPackages
 
   const handleDelete = async (id) => {
     try {
       await api.delete(`/packages/${id}`);
-      setPackages(packages.filter(p => p._id !== id));
+      refetchNow();
     } catch (err) {
       console.error(err);
     }

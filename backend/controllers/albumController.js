@@ -49,7 +49,7 @@ exports.createAlbum = async (req, res) => {
       finalCoverUrl = String(coverUrl || '');
     }
 
-    const album = new Album({ name: String(name).trim(), slug, coverUrl: finalCoverUrl });
+    const album = new Album({ name: String(name).trim(), slug, coverUrl: finalCoverUrl, approved: false });
     await album.save();
     res.status(201).json({ ok: true, album });
   } catch (err) {
@@ -60,10 +60,45 @@ exports.createAlbum = async (req, res) => {
 
 exports.getAlbums = async (req, res) => {
   try {
-    const albums = await Album.find({}).sort({ createdAt: -1 });
+    const filter = {};
+    if (req.query.approved === 'true') {
+      filter.approved = true;
+    } else if (req.query.approved === 'false') {
+      filter.approved = false;
+    } else {
+      Object.assign(filter, { $or: [{ approved: true }, { approved: { $exists: false } }] });
+    }
+    const albums = await Album.find(filter).sort({ createdAt: -1 });
     res.json(albums);
   } catch (err) {
     console.error('Error al listar álbumes:', err.message || err);
+    res.status(500).json({ error: 'server_error', detail: err.message || String(err) });
+  }
+};
+
+exports.getPendingAlbums = async (req, res) => {
+  try {
+    const albums = await Album.find({ approved: false }).sort({ createdAt: -1 });
+    res.json(albums);
+  } catch (err) {
+    console.error('Error al listar álbumes pendientes:', err.message || err);
+    res.status(500).json({ error: 'server_error', detail: err.message || String(err) });
+  }
+};
+
+exports.approveAlbum = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: 'ID de álbum inválido' });
+    }
+    const album = await Album.findById(id);
+    if (!album) return res.status(404).json({ msg: 'Álbum no encontrado' });
+    album.approved = true;
+    await album.save();
+    res.status(200).json({ ok: true, album });
+  } catch (err) {
+    console.error('Error al aprobar álbum:', err.message || err);
     res.status(500).json({ error: 'server_error', detail: err.message || String(err) });
   }
 };
@@ -96,6 +131,16 @@ exports.updateAlbum = async (req, res) => {
 
     const { name, coverUrl } = req.body;
     const updateFields = {};
+
+    const toBoolean = (val) => {
+      if (typeof val === 'boolean') return val;
+      if (typeof val === 'string') {
+        const v = val.trim().toLowerCase();
+        if (v === 'true' || v === '1') return true;
+        if (v === 'false' || v === '0') return false;
+      }
+      return Boolean(val);
+    };
 
     let newSlugCandidate = null;
     if (name !== undefined) {
@@ -136,6 +181,8 @@ exports.updateAlbum = async (req, res) => {
     } else if (coverUrl !== undefined) {
       updateFields.coverUrl = String(coverUrl || '');
     }
+
+    if (req.body.approved !== undefined) updateFields.approved = toBoolean(req.body.approved);
 
     const updated = await Album.findByIdAndUpdate(id, { $set: updateFields }, { new: true });
     return res.json({ ok: true, album: updated });

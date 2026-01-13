@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getPackages, getPackageById, createPackage, updatePackage, deletePackage } = require('../controllers/packageController');
+const { getPackages, getPackageById, createPackage, updatePackage, deletePackage, registerPackagesStream } = require('../controllers/packageController');
 const auth = require('../middleware/auth');
 const multer = require('multer');
 
@@ -11,6 +11,7 @@ const upload = multer({ storage });
 // @desc    Obtener todos los paquetes
 // @access  Public
 router.get('/', getPackages);
+router.get('/stream', registerPackagesStream);
 router.get('/:id', getPackageById);
 
 // @route   POST api/packages

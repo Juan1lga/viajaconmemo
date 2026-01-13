@@ -1,0 +1,6 @@
+/* Animación suave para tarjetas de álbumes */
+.album-card{transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;will-change:transform, box-shadow, filter}
+.album-card:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 10px 24px rgba(0,0,0,.16) !important;filter:saturate(110%) contrast(105%)}
+.album-card img{transition:transform .25s ease, filter .25s ease}
+.album-card:hover img{transform:scale(1.03);filter:brightness(1.02)}
+.album-card:active{transform:translateY(0) scale(0.995);box-shadow:0 6px 16px rgba(0,0,0,.14) !important}

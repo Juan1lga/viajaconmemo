@@ -36,19 +36,20 @@ api.interceptors.response.use(
 const CACHE_TTL_MS = 3600000;
 const readCache = (key) => { try { const raw = localStorage.getItem(key); if (!raw) return null; const obj = JSON.parse(raw); if (!obj || typeof obj !== 'object') return null; return obj; } catch (_) { return null; } };
 const writeCache = (key, value) => { try { const payload = { ts: Date.now(), data: value }; localStorage.setItem(key, JSON.stringify(payload)); } catch (_) {} };
+const withTs = (p) => { const sep = p.includes('?') ? '&' : '?'; return `${p}${sep}_ts=${Date.now()}`; };
 const cachedGet = async (path, options = {}, cacheKey) => {
   const getOpts = { ...options, timeout: Math.min((options && options.timeout) || 5000, 5000) };
   const cachedObj = cacheKey ? readCache(cacheKey) : null;
   const expired = cachedObj ? (Date.now() - (cachedObj.ts || 0) > CACHE_TTL_MS) : false;
   if (cachedObj) {
     // Mostrar datos de caché inmediatamente y revalidar en segundo plano
-    api.get(path, getOpts).then((res) => {
+    api.get(withTs(path), getOpts).then((res) => {
       if (cacheKey) writeCache(cacheKey, res.data);
     }).catch(() => {});
     return { data: cachedObj.data, stale: expired };
   }
   const attempt = async () => {
-    const res = await api.get(path, getOpts);
+    const res = await api.get(withTs(path), getOpts);
     if (cacheKey) writeCache(cacheKey, res.data);
     return res;
   };

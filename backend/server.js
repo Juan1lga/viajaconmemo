@@ -41,9 +41,10 @@ const corsOptions = {
   },
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   credentials: true,
-  allowedHeaders: ['Content-Type','Authorization','Cache-Control','cache-control']
+  allowedHeaders: ['Content-Type','Authorization']
 };
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 // Habilitar compresión HTTP y Keep-Alive
 app.use(compression());

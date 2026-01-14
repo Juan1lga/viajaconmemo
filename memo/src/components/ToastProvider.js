@@ -4,6 +4,20 @@ const ToastContext = createContext({ showSuccess: () => {}, showError: () => {} 
 export const useToast = () => useContext(ToastContext);
 
 const genId = () => Math.random().toString(36).slice(2);
+const isTimeoutLike = (msg) => {
+  try {
+    if (typeof msg === "string") return /timeout|ECONNABORTED/i.test(msg);
+    if (msg && typeof msg === "object") {
+      const code = msg.code || "";
+      const status = msg.response?.status;
+      const message = String(msg.message || "");
+      return code === "ECONNABORTED" || /timeout/i.test(message) || status === 408 || status === 504;
+    }
+    return false;
+  } catch (_) {
+    return false;
+  }
+};
 
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
@@ -19,16 +33,29 @@ export const ToastProvider = ({ children }) => {
   }, []);
 
   const pushToast = React.useCallback((type, message, options = {}) => {
+    const isSilent = options && options.silent;
+    if (isSilent || isTimeoutLike(message)) {
+      return;
+    }
+    const safeMsg = typeof message === "string"
+      ? message
+      : (message?.response?.data?.msg || String(message?.message || "") || "");
+    if (!safeMsg || !String(safeMsg).trim()) {
+      return;
+    }
     const id = genId();
     const ttl = options.ttl ?? 4000; // ms
-    const newToast = { id, type, message };
+    const newToast = { id, type, message: safeMsg };
     setToasts((prev) => [newToast, ...prev]);
     const timer = setTimeout(() => removeToast(id), ttl);
     timersRef.current.set(id, timer);
   }, [removeToast]);
 
   const showSuccess = React.useCallback((message, options) => pushToast("success", message, options), [pushToast]);
-  const showError = React.useCallback((message, options) => pushToast("error", message, options), [pushToast]);
+  const showError = React.useCallback((message, options) => {
+    if (isTimeoutLike(message)) return;
+    return pushToast("error", message, options);
+  }, [pushToast]);
 
   const value = useMemo(() => ({ showSuccess, showError }), [showSuccess, showError]);
 

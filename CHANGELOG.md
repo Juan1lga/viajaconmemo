@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.2.1 (2026-01-14)
+
+### Frontend
+- Mejora de estilos y organización de componentes y servicios para una UI más consistente.
+- Correcciones en hooks de React para evitar bucles en useEffect y mejorar estabilidad.
+
+### Backend
+- Optimización en endpoints de salud y proceso de arranque para mejores tiempos de respuesta.
+- Ajustes de rendimiento en compresión y keep-alive.
+
+### Documentación
+- Se mantiene README sin cambios funcionales; flujo de splash y health siguen vigentes.
+
+
 ## v0.2.0 (2026-01-13)
 
 ### Frontend

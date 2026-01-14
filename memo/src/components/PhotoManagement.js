@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { assetsOrigin } from '../utils/api';
-import api from '../utils/api';
+import api, { assetsOrigin, isTimeoutLike } from '../utils/api';
 import './AdminDashboard.css'; // Reutilizando algunos estilos de AdminDashboard
 
 const PhotoManagement = ({ token }) => {
@@ -53,6 +52,9 @@ const PhotoManagement = ({ token }) => {
       fetchPhotos();
     } catch (err) {
       console.error('Error al guardar la foto:', err?.response?.data?.msg || err.message);
+      if (isTimeoutLike(err)) {
+        return;
+      }
       setError('Error al guardar la foto: ' + (err?.response?.data?.msg || err.message));
       setMessage('');
     }
@@ -66,6 +68,9 @@ const PhotoManagement = ({ token }) => {
       fetchPhotos(); // Refresh photos to show updated status
     } catch (err) {
       console.error('Error al aprobar la foto:', err?.response?.data?.msg || err.message);
+      if (isTimeoutLike(err)) {
+        return;
+      }
       setError('Error al aprobar la foto: ' + (err?.response?.data?.msg || err.message));
       setMessage('');
     }
@@ -79,6 +84,9 @@ const PhotoManagement = ({ token }) => {
       fetchPhotos();
     } catch (err) {
       console.error('Error al eliminar la foto:', err?.response?.data?.msg || err.message);
+      if (isTimeoutLike(err)) {
+        return;
+      }
       setError('Error al eliminar la foto: ' + (err?.response?.data?.msg || err.message));
       setMessage('');
     }

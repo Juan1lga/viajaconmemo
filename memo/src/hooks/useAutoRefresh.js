@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { getPackagesLive } from "../utils/api";
 
 const useAutoRefreshPackages = (params = {}, intervalMs = 2000) => {
@@ -8,31 +8,38 @@ const useAutoRefreshPackages = (params = {}, intervalMs = 2000) => {
   const mountedRef = useRef(true);
   const timerRef = useRef(null);
   const firstLoadRef = useRef(true);
+  const paramsSig = useMemo(() => JSON.stringify(params), [params]);
+  const safeParams = useMemo(() => {
+    try {
+      return JSON.parse(paramsSig);
+    } catch {
+      return {};
+    }
+  }, [paramsSig]);
 
-  const doFetch = async () => {
+  const doFetch = useCallback(async () => {
     try {
       if (!mountedRef.current) return;
       if (firstLoadRef.current) setLoading(true);
       setError("");
-      const { data: res } = await getPackagesLive(params);
+      const { data: res } = await getPackagesLive(safeParams);
       if (!mountedRef.current) return;
       setData(Array.isArray(res) ? res : []);
       setError("");
     } catch (e) {
       if (!mountedRef.current) return;
       setError(e?.response?.data?.msg || e?.message || "No se pudieron cargar los paquetes.");
-      // Mantener los datos previos para evitar saltos en la UI
     } finally {
       if (mountedRef.current && firstLoadRef.current) {
         setLoading(false);
         firstLoadRef.current = false;
       }
     }
-  };
+  }, [safeParams]);
 
-  const refetchNow = () => {
+  const refetchNow = useCallback(() => {
     doFetch();
-  };
+  }, [doFetch]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -67,8 +74,7 @@ const useAutoRefreshPackages = (params = {}, intervalMs = 2000) => {
         document.removeEventListener("visibilitychange", handleVisibility);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(params), intervalMs]);
+  }, [doFetch, intervalMs]);
 
   return { data, loading, error, refetchNow };
 };

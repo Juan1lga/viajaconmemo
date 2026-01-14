@@ -41,10 +41,10 @@ const corsOptions = {
   },
   methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
   credentials: true,
-  allowedHeaders: ['Content-Type','Authorization']
+  allowedHeaders: ['Content-Type','Authorization','Cache-Control']
 };
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+
 app.use(express.json());
 // Habilitar compresión HTTP y Keep-Alive
 app.use(compression());
@@ -112,9 +112,6 @@ connectPromise.then(() => warmUp());
 app.use('/api', (req, res, next) => {
   if (req.method === 'OPTIONS') return next();
   if (req.path === '/health') return next();
-  if (!isConnected) {
-    return res.status(503).json({ error: 'Servicio temporalmente no disponible', detail: 'Sin conexión a la base de datos', retryAfterMs: 5000 });
-  }
   next();
 });
 app.use('/api/auth', require('./routes/auth'));

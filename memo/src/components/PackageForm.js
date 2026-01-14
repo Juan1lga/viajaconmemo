@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../utils/api';
+import api, { isTimeoutLike } from '../utils/api';
 import { useNavigate, useParams } from 'react-router-dom';
 import './PackageForm.css';
 import { useToast } from './ToastProvider';
@@ -40,7 +40,7 @@ const PackageForm = ({ token }) => {
         setPriceCustom4(pkg.priceCustom4 != null ? String(pkg.priceCustom4) : '');
         setImage(pkg.image);
         setDuration(pkg.duration || '');
-        setCategory((['Hoteles en la Riviera Maya','Nuestros paquetes nacionales','Nuestros pasadías','Nuestros paquetes internacionales','Nuestros viajes a Europa'].includes(pkg.category)) ? pkg.category : 'Nuestros paquetes nacionales');
+        setCategory((['Hoteles en la Riviera Maya','Hoteles Nacionales','Nuestros paquetes nacionales','Nuestros pasadías','Nuestros paquetes internacionales','Nuestros viajes a Europa'].includes(pkg.category)) ? pkg.category : 'Nuestros paquetes nacionales');
         setIncludesInput(Array.isArray(pkg.includes) ? pkg.includes.join(', ') : (pkg.includes || ''));
         setPopular(Boolean(pkg.popular));
         setCurrency((pkg.currency === 'MXN' || pkg.currency === 'USD') ? pkg.currency : 'USD');
@@ -90,6 +90,9 @@ const PackageForm = ({ token }) => {
         navigate('/admin');
       } catch (err) {
         console.error(err);
+        if (isTimeoutLike(err)) {
+          return;
+        }
         const msg = err?.response?.data?.msg || 'Error al actualizar el paquete';
         showError(msg);
       }
@@ -109,6 +112,9 @@ const PackageForm = ({ token }) => {
         navigate('/admin');
       } catch (err) {
         console.error(err);
+        if (isTimeoutLike(err)) {
+          return;
+        }
         const msg = err?.response?.data?.msg || 'Error al crear el paquete';
         showError(msg);
       }
@@ -159,6 +165,7 @@ const PackageForm = ({ token }) => {
             <label className="form-label">Categoría</label>
             <select className='form-select' value={category} onChange={(e) => setCategory(e.target.value)}>
               <option value='Hoteles en la Riviera Maya'>Hoteles en la Riviera Maya</option>
+              <option value='Hoteles Nacionales'>Hoteles Nacionales</option>
               <option value='Nuestros paquetes nacionales'>Nuestros paquetes nacionales</option>
               <option value='Nuestros pasadías'>Nuestros pasadías</option>
               <option value='Nuestros paquetes internacionales'>Nuestros paquetes internacionales</option>

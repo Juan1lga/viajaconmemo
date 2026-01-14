@@ -3,6 +3,17 @@ const baseURL = process.env.REACT_APP_API_BASE || "http://localhost:5000/api";
 export const assetsOrigin = process.env.REACT_APP_ASSETS_ORIGIN || baseURL.replace(/\/api$/, "");
 const api = axios.create({ baseURL, timeout: 30000 });
 
+export const isTimeoutLike = (error) => {
+  try {
+    const status = error?.response?.status;
+    const code = error?.code;
+    const message = String(error?.message || "");
+    return code === 'ECONNABORTED' || /timeout/i.test(message) || status === 408 || status === 504;
+  } catch (_) {
+    return false;
+  }
+};
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -17,15 +28,28 @@ api.interceptors.response.use(
     const status = error?.response?.status;
     const method = (error?.config?.method || 'get').toLowerCase();
     const isNetworkErr = error && (error.code === 'ERR_NETWORK' || status === 0 || status === 502 || status === 503 || status === 504);
+    const isTimeoutErr = error && (error.code === 'ECONNABORTED' || /timeout/i.test(String(error.message)) || status === 408);
+    const silentErr = isNetworkErr || isTimeoutErr;
     if (status === 401) {
       try { localStorage.removeItem("token"); } catch (_) {}
       if (typeof window !== "undefined") window.location.href = "/admin-login";
       return Promise.reject(error);
     }
-    if (isNetworkErr) {
+    if (silentErr) {
       if (method === 'get') {
         return { data: [], status: 200, headers: {}, config: error.config };
       }
+      try {
+        if (typeof error.message === "string") {
+          error.message = "";
+        }
+        if (error.response && error.response.data && typeof error.response.data.msg === "string") {
+          const m = error.response.data.msg;
+          if (/timeout/i.test(m) || /econnaborted/i.test(m)) {
+            error.response.data.msg = "";
+          }
+        }
+      } catch (_) {}
       return Promise.reject(error);
     }
     return Promise.reject(error);

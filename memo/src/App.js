@@ -22,7 +22,7 @@ import Footer from './components/Footer';
 import BackgroundCarousel from './components/BackgroundCarousel';
 import BackButton from './components/BackButton';
 import { AlbumsPage, AlbumDetailPage } from './components/AlbumsFeature';
-import api, { getPackages, getAlbums } from './utils/api';
+import api from './utils/api';
 import LoadingSplash from './components/LoadingSplash';
 import PageTransitionOverlay from './components/PageTransitionOverlay';
 
@@ -78,14 +78,12 @@ function App() {
       try {
         const { data } = await api.get('/health', { timeout: 4000 });
         const ok = data && data.status === 'ok';
-        const connected = !!(data && data.db && data.db.connected === true);
-        if (ok && connected) {
+        if (ok) {
           clearTimeout(maxHideTimer);
           if (intervalId) { clearInterval(intervalId); }
           const elapsed = Date.now() - startedAt;
           const wait = Math.max(0, minSplashMs - elapsed);
           hideTimerId = setTimeout(() => { if (aliveRef.current) setIsBooting(false); }, wait);
-          try { getPackages(); getAlbums(); } catch (_) {}
         }
       } catch (_) {}
     };

@@ -66,3 +66,25 @@ git branch -M main
 git remote add origin https://github.com/TU_USUARIO/viaja-con-memo.git
 git push -u origin main
 ```
+
+## Versionado y etiquetado
+Sigue estos pasos para preparar un lanzamiento ordenado:
+1. Organiza los commits por área:
+   - Frontend: "chore(frontend): bump version a 0.2.0"
+   - Backend: "chore(backend): bump version a 1.1.0"
+   - Documentación: "docs: actualizar README y CHANGELOG"
+2. Actualiza las versiones en `memo/package.json` y `backend/package.json` según corresponda.
+3. Actualiza `CHANGELOG.md` con los cambios del release.
+4. Crea la etiqueta de versión (ejemplo para v0.2.0):
+   ```bash
+   git tag -a v0.2.0 -m "Release v0.2.0: mejoras de UI, splash, transiciones, CORS y health endpoints; frontend 0.2.0, backend 1.1.0"
+   ```
+5. Empuja los commits y la etiqueta:
+   ```bash
+   git push origin main
+   git push origin v0.2.0
+   ```
+6. Verifica el estado remoto:
+   ```bash
+   git remote -v
+   ```
